@@ -9,18 +9,18 @@ from toil.job import Job
 
 # Package methods
 from ddb import configuration
-from ngsflow import gatk
-from ngsflow import annotation
-from ngsflow.align import bwa
-from ngsflow import pipeline
-from ngsflow.variation import variation
-from ngsflow.variation import freebayes
-from ngsflow.variation import mutect
-from ngsflow.variation import platypus
-from ngsflow.variation import vardict
-from ngsflow.variation import scalpel
-from ngsflow.variation import indelminer
-from ngsflow.variation import pisces
+from ddb_ngsflow import gatk
+from ddb_ngsflow import annotation
+from ddb_ngsflow.align import bwa
+from ddb_ngsflow import pipeline
+from ddb_ngsflow.variation import variation
+from ddb_ngsflow.variation import freebayes
+from ddb_ngsflow.variation import mutect
+from ddb_ngsflow.variation import platypus
+from ddb_ngsflow.variation import vardict
+from ddb_ngsflow.variation import scalpel
+from ddb_ngsflow.variation import indelminer
+from ddb_ngsflow.variation import pisces
 
 
 if __name__ == "__main__":

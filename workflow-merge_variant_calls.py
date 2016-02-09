@@ -9,10 +9,10 @@ from toil.job import Job
 
 # Package methods
 from ddb import configuration
-from ngsflow import gatk
-from ngsflow import annotation
-from ngsflow import pipeline
-from ngsflow.variation import variation
+from ddb_ngsflow import gatk
+from ddb_ngsflow import annotation
+from ddb_ngsflow import pipeline
+from ddb_ngsflow.variation import variation
 
 
 if __name__ == "__main__":

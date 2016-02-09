@@ -6,10 +6,10 @@ import argparse
 from toil.job import Job
 
 from ddb import configuration
-from ngsflow import gatk
-from ngsflow import annotation
-from ngsflow import pipeline
-from ngsflow.utils import utilities
+from ddb_ngsflow import gatk
+from ddb_ngsflow import annotation
+from ddb_ngsflow import pipeline
+from ddb_ngsflow.utils import utilities
 
 
 if __name__ == "__main__":

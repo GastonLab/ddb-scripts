@@ -9,8 +9,8 @@ from toil.job import Job
 
 # Package methods
 from ddb import configuration
-from ngsflow import pipeline
-from ngsflow.utils import utilities
+from ddb_ngsflow import pipeline
+from ddb_ngsflow.utils import utilities
 
 
 if __name__ == "__main__":
