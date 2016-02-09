@@ -8,6 +8,7 @@ from toil.job import Job
 from ddb import configuration
 from ddb_ngsflow import gatk
 from ddb_ngsflow import annotation
+from ddb_ngsflow import variation
 from ddb_ngsflow import pipeline
 from ddb_ngsflow.utils import utilities
 
@@ -36,7 +37,7 @@ if __name__ == "__main__":
                                           memory="{}G".format(config['gatk']['max_mem']))
         gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, sample, gatk_annotate_job.rv(),
                                         cores=1, memory="{}G".format(config['gatk']['max_mem']))
-        normalization_job = Job.wrapJobFn(utilities.vt_normalization, config, sample, gatk_filter_job.rv(),
+        normalization_job = Job.wrapJobFn(variation.vt_normalization, config, sample, gatk_filter_job.rv(),
                                           cores=1, memory="2G")
         snpeff_job = Job.wrapJobFn(annotation.snpeff, config, sample, normalization_job.rv(),
                                    cores=1, memory="{}G".format(config['snpeff']['max_mem']))
