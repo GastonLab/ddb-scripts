@@ -47,10 +47,10 @@ if __name__ == "__main__":
                                    cores=1,
                                    memory="{}G".format(config['mutect']['max_mem']))
 
-        # mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples[sample]['bam'],
-        #                             cores=1,
-        #                             memory="{}G".format(config['mutect']['max_mem']))
-        #
+        mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples[sample]['bam'],
+                                    cores=1,
+                                    memory="{}G".format(config['mutect']['max_mem']))
+
         vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples, samples[sample]['bam'],
                                     cores=int(config['vardict']['num_cores']),
                                     memory="{}G".format(config['vardict']['max_mem']))
@@ -67,19 +67,19 @@ if __name__ == "__main__":
                                      cores=int(config['platypus']['num_cores']),
                                      memory="{}G".format(config['platypus']['max_mem']))
 
-        # pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample, samples[sample]['bam'],
-        #                            cores=int(config['pindel']['num_cores']),
-        #                            memory="{}G".format(config['pindel']['max_mem']))
+        pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample, samples[sample]['bam'],
+                                   cores=int(config['pindel']['num_cores']),
+                                   memory="{}G".format(config['pindel']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(freebayes_job)
         root_job.addChild(mutect_job)
-        # root_job.addChild(mutect2_job)
+        root_job.addChild(mutect2_job)
         root_job.addChild(vardict_job)
         root_job.addChild(scalpel_job)
         root_job.addChild(scanindel_job)
         root_job.addChild(platypus_job)
-        # root_job.addChild(pindel_job)
+        root_job.addChild(pindel_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
