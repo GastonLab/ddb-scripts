@@ -15,7 +15,6 @@ from ddb_ngsflow.variation import mutect
 from ddb_ngsflow.variation import platypus
 from ddb_ngsflow.variation import vardict
 from ddb_ngsflow.variation import scalpel
-from ddb_ngsflow.variation import pisces
 from ddb_ngsflow.variation.sv import scanindel
 from ddb_ngsflow.variation.sv import pindel
 
