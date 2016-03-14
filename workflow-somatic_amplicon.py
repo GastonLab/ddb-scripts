@@ -69,57 +69,57 @@ if __name__ == "__main__":
                                   memory="{}G".format(config['gatk']['max_mem']))
         # Variant Calling
         spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
-        freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample, samples[sample]['bam'],
+        freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample, align_job.rv(),
                                       cores=1,
                                       memory="{}G".format(config['freebayes']['max_mem']))
 
-        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples[sample]['bam'],
+        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, align_job.rv(),
                                    cores=1,
                                    memory="{}G".format(config['mutect']['max_mem']))
 
-        # mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples[sample]['bam'],
+        # mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, align_job.rv(),
         #                             cores=1,
         #                             memory="{}G".format(config['mutect']['max_mem']))
         #
-        vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples, samples[sample]['bam'],
+        vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples, align_job.rv(),
                                     cores=int(config['vardict']['num_cores']),
                                     memory="{}G".format(config['vardict']['max_mem']))
 
-        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples, samples[sample]['bam'],
+        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples, align_job.rv(),
                                     cores=int(config['scalpel']['num_cores']),
                                     memory="{}G".format(config['scalpel']['max_mem']))
 
-        scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples, samples[sample]['bam'],
-                                      cores=int(config['scanindel']['num_cores']),
-                                      memory="{}G".format(config['scanindel']['max_mem']))
+        # scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples, align_job.rv(),
+        #                               cores=int(config['scanindel']['num_cores']),
+        #                               memory="{}G".format(config['scanindel']['max_mem']))
+        #
+        # platypus_job = Job.wrapJobFn(platypus.platypus_single, config, sample, samples, align_job.rv(),
+        #                              cores=int(config['platypus']['num_cores']),
+        #                              memory="{}G".format(config['platypus']['max_mem']))
 
-        platypus_job = Job.wrapJobFn(platypus.platypus_single, config, sample, samples, samples[sample]['bam'],
-                                     cores=int(config['platypus']['num_cores']),
-                                     memory="{}G".format(config['platypus']['max_mem']))
-
-        # pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample, samples[sample]['bam'],
+        # pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample, align_job.rv(),
         #                            cores=int(config['pindel']['num_cores']),
         #                            memory="{}G".format(config['pindel']['max_mem']))
 
         # Need to filter for on target only results somewhere as well
         spawn_normalization_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
         normalization_job1 = Job.wrapJobFn(variation.vt_normalization, config, sample, "mutect",
-                                           samples[sample]['mutect'],
+                                           mutect_job.rv(),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job2 = Job.wrapJobFn(variation.vt_normalization, config, sample, "scalpel",
-                                           samples[sample]['scalpel'],
+                                           scalpel_job.rv(),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job3 = Job.wrapJobFn(variation.vt_normalization, config, sample, "freebayes",
-                                           samples[sample]['freebayes'],
+                                           freebayes_job.rv(),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job4 = Job.wrapJobFn(variation.vt_normalization, config, sample, "vardict",
-                                           samples[sample]['vardict'],
+                                           vardict_job.rv(),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
@@ -164,8 +164,8 @@ if __name__ == "__main__":
         # spawn_variant_job.addChild(mutect2_job)
         spawn_variant_job.addChild(vardict_job)
         spawn_variant_job.addChild(scalpel_job)
-        spawn_variant_job.addChild(scanindel_job)
-        spawn_variant_job.addChild(platypus_job)
+        # spawn_variant_job.addChild(scanindel_job)
+        # spawn_variant_job.addChild(platypus_job)
         # spawn_variant_job.addChild(pindel_job)
 
         spawn_variant_job.addFollowOn(spawn_normalization_job)
