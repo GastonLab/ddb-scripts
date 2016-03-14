@@ -134,7 +134,7 @@ if __name__ == "__main__":
         # on_target_job = Job.wrapJobFn(utilities.bcftools_filter_variants_regions, config, sample, samples,
         #                               merge_job.rv())
 
-        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(), samples[sample]['bam'],
+        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(), align_job.rv(),
                                           cores=int(config['gatk']['num_cores']),
                                           memory="{}G".format(config['gatk']['max_mem']))
 
