@@ -89,9 +89,9 @@ if __name__ == "__main__":
                                     cores=int(config['scalpel']['num_cores']),
                                     memory="{}G".format(config['scalpel']['max_mem']))
 
-        scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples, recal_job.rv(),
-                                      cores=int(config['scanindel']['num_cores']),
-                                      memory="{}G".format(config['scanindel']['max_mem']))
+        # scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples, recal_job.rv(),
+        #                               cores=int(config['scanindel']['num_cores']),
+        #                               memory="{}G".format(config['scanindel']['max_mem']))
 
         platypus_job = Job.wrapJobFn(platypus.platypus_single, config, sample, samples, recal_job.rv(),
                                      cores=int(config['platypus']['num_cores']),
@@ -124,10 +124,10 @@ if __name__ == "__main__":
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
-        normalization_job5 = Job.wrapJobFn(variation.vt_normalization, config, sample, "scanindel",
-                                           scanindel_job.rv(),
-                                           cores=1,
-                                           memory="{}G".format(config['gatk']['max_mem']))
+        # normalization_job5 = Job.wrapJobFn(variation.vt_normalization, config, sample, "scanindel",
+        #                                    scanindel_job.rv(),
+        #                                    cores=1,
+        #                                    memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job6 = Job.wrapJobFn(variation.vt_normalization, config, sample, "platypus",
                                            platypus_job.rv(),
@@ -139,13 +139,12 @@ if __name__ == "__main__":
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
-        callers = "freebayes, mutect, vardict, scalpel, scanindel, platypus, pindel"
+        callers = "freebayes, mutect, vardict, scalpel, platypus, pindel"
 
         merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
                                                                                            normalization_job2.rv(),
                                                                                            normalization_job3.rv(),
                                                                                            normalization_job4.rv(),
-                                                                                           normalization_job5.rv(),
                                                                                            normalization_job6.rv(),
                                                                                            normalization_job7.rv()))
 
