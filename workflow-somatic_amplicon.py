@@ -124,20 +124,20 @@ if __name__ == "__main__":
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
-        # normalization_job5 = Job.wrapJobFn(variation.vt_normalization, config, sample, "scanindel",
-        #                                    scanindel_job.rv(),
-        #                                    cores=1,
-        #                                    memory="{}G".format(config['gatk']['max_mem']))
-
-        normalization_job6 = Job.wrapJobFn(variation.vt_normalization, config, sample, "platypus",
+        normalization_job5 = Job.wrapJobFn(variation.vt_normalization, config, sample, "platypus",
                                            platypus_job.rv(),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
-        normalization_job7 = Job.wrapJobFn(variation.vt_normalization, config, sample, "pindel",
+        normalization_job6 = Job.wrapJobFn(variation.vt_normalization, config, sample, "pindel",
                                            pindel_job.rv(),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
+
+        # normalization_job5 = Job.wrapJobFn(variation.vt_normalization, config, sample, "scanindel",
+        #                                    scanindel_job.rv(),
+        #                                    cores=1,
+        #                                    memory="{}G".format(config['gatk']['max_mem']))
 
         callers = "freebayes, mutect, vardict, scalpel, platypus, pindel"
 
@@ -145,8 +145,8 @@ if __name__ == "__main__":
                                                                                            normalization_job2.rv(),
                                                                                            normalization_job3.rv(),
                                                                                            normalization_job4.rv(),
-                                                                                           normalization_job6.rv(),
-                                                                                           normalization_job7.rv()))
+                                                                                           normalization_job5.rv(),
+                                                                                           normalization_job6.rv()))
 
         # Removed temporarily until config generation script more easily adds in appropriate region files
         # on_target_job = Job.wrapJobFn(utilities.bcftools_filter_variants_regions, config, sample, samples,
@@ -183,8 +183,8 @@ if __name__ == "__main__":
         spawn_variant_job.addChild(vardict_job)
         spawn_variant_job.addChild(scalpel_job)
         # spawn_variant_job.addChild(scanindel_job)
-        # spawn_variant_job.addChild(platypus_job)
-        # spawn_variant_job.addChild(pindel_job)
+        spawn_variant_job.addChild(platypus_job)
+        spawn_variant_job.addChild(pindel_job)
 
         spawn_variant_job.addFollowOn(spawn_normalization_job)
 
@@ -192,6 +192,8 @@ if __name__ == "__main__":
         spawn_normalization_job.addChild(normalization_job2)
         spawn_normalization_job.addChild(normalization_job3)
         spawn_normalization_job.addChild(normalization_job4)
+        spawn_normalization_job.addChild(normalization_job5)
+        spawn_normalization_job.addChild(normalization_job6)
 
         spawn_normalization_job.addFollowOn(merge_job)
 
