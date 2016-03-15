@@ -10,7 +10,7 @@ from toil.job import Job
 # Package methods
 from ddb import configuration
 from ddb_ngsflow import pipeline
-from ddb_ngsflow.variation import mutect
+from ddb_ngsflow.variation.sv import pindel
 
 
 if __name__ == "__main__":
@@ -32,11 +32,11 @@ if __name__ == "__main__":
 
     # Per sample variant calling jobs
     for sample in samples:
-        mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples[sample]['bam'],
-                                    cores=int(config['pindel']['num_cores']),
-                                    memory="{}G".format(config['pindel']['max_mem']))
+        pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample, samples[sample]['bam'],
+                                   cores=int(config['pindel']['num_cores']),
+                                   memory="{}G".format(config['pindel']['max_mem']))
 
-        root_job.addChild(mutect2_job)
+        root_job.addChild(pindel_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
