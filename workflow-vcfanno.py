@@ -29,13 +29,11 @@ if __name__ == "__main__":
 
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
-    # root_job.addChildJobFn(utilities.run_fastqc, config, samples,
-    #                        cores=1,
-    #                        memory="{}G".format(config['fastqc']['max_mem']))
 
     # Per sample jobs
     for sample in samples:
-        vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample, samples[sample]['annotated'],
+        vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample,
+                                    "{}.snpEff.{}.vcf".format(sample, config['snpeff']['reference']),
                                     cores=int(config['vcfanno']['num_cores']),
                                     memory="{}G".format(config['vcfanno']['max_mem']))
 
