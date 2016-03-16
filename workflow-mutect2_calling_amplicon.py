@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Per sample variant calling jobs
     for sample in samples:
         mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples,
-                                    samples[sample]['bam'] or "{}.recalibrated.sorted.bam".format(sample),
+                                    samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['gatk3.5']['num_cores']),
                                     memory="{}G".format(config['gatk3.5']['max_mem']))
 
