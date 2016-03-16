@@ -30,7 +30,8 @@ if __name__ == "__main__":
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs)
 
     for sample in samples:
-        diagnose_targets_job = Job.wrapJobFn(gatk.diagnosetargets, config, sample, samples, samples[sample]['bam'],
+        diagnose_targets_job = Job.wrapJobFn(gatk.diagnosetargets, config, sample, samples,
+                                             "{}.recalibrated.sorted.bam".format(sample),
                                              cores=int(config['gatk']['num_cores']),
                                              memory="{}G".format(config['gatk']['max_mem']))
         root_job.addChild(diagnose_targets_job)
