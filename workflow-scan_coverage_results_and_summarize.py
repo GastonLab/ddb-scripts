@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     sample_results = dict()
     for sample in samples:
-        scan_job = Job.wrapJobFn(utilities.read_coverage, config, sample, samples[sample]['vcf'],
+        scan_job = Job.wrapJobFn(utilities.read_coverage, config, sample, "{}.diagnosetargets.vcf".format(sample),
                                  cores=1, memory="2G")
         sample_results[sample] = scan_job.rv()
         root_job.addChild(scan_job)
