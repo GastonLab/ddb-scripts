@@ -77,9 +77,9 @@ if __name__ == "__main__":
                                    cores=1,
                                    memory="{}G".format(config['mutect']['max_mem']))
 
-        # mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, recal_job.rv(),
-        #                             cores=1,
-        #                             memory="{}G".format(config['mutect']['max_mem']))
+        # mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples, recal_job.rv(),
+        #                             cores="{}G".format(config['gatk3.5']['max_mem'],
+        #                             memory="{}G".format(config['gatk3.5']['max_mem']))
         #
         vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples, recal_job.rv(),
                                     cores=int(config['vardict']['num_cores']),
