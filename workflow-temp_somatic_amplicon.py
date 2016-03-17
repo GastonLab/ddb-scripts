@@ -104,10 +104,6 @@ if __name__ == "__main__":
                                    cores=int(config['snpeff']['num_cores']),
                                    memory="{}G".format(config['snpeff']['max_mem']))
 
-        gemini_job = Job.wrapJobFn(annotation.gemini, config, sample, snpeff_job.rv(),
-                                   cores=int(config['gatk']['num_cores']),
-                                   memory="{}G".format(config['gemini']['max_mem']))
-
         # Create workflow from created jobs
         root_job.addChild(spawn_normalization_job)
 
@@ -124,7 +120,6 @@ if __name__ == "__main__":
         # on_target_job.addChild(gatk_annotate_job)
         gatk_annotate_job.addChild(gatk_filter_job)
         gatk_filter_job.addChild(snpeff_job)
-        snpeff_job.addChild(gemini_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
