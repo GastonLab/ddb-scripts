@@ -130,7 +130,8 @@ if __name__ == "__main__":
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job6 = Job.wrapJobFn(variation.vt_normalization, config, sample, "pindel",
-                                           pindel_job.rv(),
+                                           # pindel_job.rv(),
+                                           "{}.pindel.vcf".format(sample),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
