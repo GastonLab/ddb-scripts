@@ -91,18 +91,18 @@ if __name__ == "__main__":
         # on_target_job = Job.wrapJobFn(utilities.bcftools_filter_variants_regions, config, sample, samples,
         #                               merge_job.rv())
 
-        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(),
-                                          "{}.recalibrated.sorted.bam".format(sample),
-                                          cores=int(config['gatk']['num_cores']),
-                                          memory="{}G".format(config['gatk']['max_mem']))
-
-        gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, sample, gatk_annotate_job.rv(),
-                                        cores=1,
-                                        memory="{}G".format(config['gatk']['max_mem']))
-
-        snpeff_job = Job.wrapJobFn(annotation.snpeff, config, sample, gatk_filter_job.rv(),
-                                   cores=int(config['snpeff']['num_cores']),
-                                   memory="{}G".format(config['snpeff']['max_mem']))
+        # gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(),
+        #                                   "{}.recalibrated.sorted.bam".format(sample),
+        #                                   cores=int(config['gatk']['num_cores']),
+        #                                   memory="{}G".format(config['gatk']['max_mem']))
+        #
+        # gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, sample, gatk_annotate_job.rv(),
+        #                                 cores=1,
+        #                                 memory="{}G".format(config['gatk']['max_mem']))
+        #
+        # snpeff_job = Job.wrapJobFn(annotation.snpeff, config, sample, gatk_filter_job.rv(),
+        #                            cores=int(config['snpeff']['num_cores']),
+        #                            memory="{}G".format(config['snpeff']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(spawn_normalization_job)
@@ -116,10 +116,10 @@ if __name__ == "__main__":
 
         spawn_normalization_job.addFollowOn(merge_job)
 
-        merge_job.addChild(gatk_annotate_job)
+        # merge_job.addChild(gatk_annotate_job)
         # on_target_job.addChild(gatk_annotate_job)
-        gatk_annotate_job.addChild(gatk_filter_job)
-        gatk_filter_job.addChild(snpeff_job)
+        # gatk_annotate_job.addChild(gatk_filter_job)
+        # gatk_filter_job.addChild(snpeff_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
