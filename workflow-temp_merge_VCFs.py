@@ -34,7 +34,7 @@ if __name__ == "__main__":
     for sample in samples:
         # Need to filter for on target only results somewhere as well
         # callers = "freebayes, mutect, vardict, scalpel, platypus, pindel"
-        callers = "freebayes, mutect, vardict, scalpel"
+        callers = "freebayes,mutect,vardict,scalpel"
 
         merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, ("{}.freebayes.normalized.vcf".format(sample),
                                                                                            "{}.mutect.normalized.vcf".format(sample),
