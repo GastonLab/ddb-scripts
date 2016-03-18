@@ -42,7 +42,9 @@ if __name__ == "__main__":
                                                                                            "{}.scalpel.normalized.vcf".format(sample),
                                                                                            # "{}.platypus.normalized.vcf".format(sample),
                                                                                            # "{}.pindel.normalized.vcf".format(sample)
-                                                                                           ))
+                                                                                           ),
+                                  cores=int(config['ensemble']['num_cores']),
+                                  memory="{}G".format(config['ensemble']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(merge_job)
