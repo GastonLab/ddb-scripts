@@ -34,7 +34,8 @@ if __name__ == "__main__":
 
     # Per sample jobs
     for sample in samples:
-        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(), samples[sample]['bam'],
+        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, "{}.merged.sorted.vcf".format(sample),
+                                          "{}.recalibrated.sorted.bam".format(sample),
                                           cores=int(config['gatk']['num_cores']),
                                           memory="{}G".format(config['gatk']['max_mem']))
 

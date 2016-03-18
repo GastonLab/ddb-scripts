@@ -31,9 +31,6 @@ if __name__ == "__main__":
 
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
-    # root_job.addChildJobFn(utilities.run_fastqc, config, samples,
-    #                        cores=1,
-    #                        memory="{}G".format(config['fastqc']['max_mem']))
 
     # Per sample jobs
     for sample in samples:
@@ -65,10 +62,6 @@ if __name__ == "__main__":
                                                                                            normalization_job2.rv(),
                                                                                            normalization_job3.rv(),
                                                                                            normalization_job4.rv()))
-
-        # Removed temporarily until config generation script more easily adds in appropriate region files
-        # on_target_job = Job.wrapJobFn(utilities.bcftools_filter_variants_regions, config, sample, samples,
-        #                               merge_job.rv())
 
         gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(), samples[sample]['bam'],
                                           cores=int(config['gatk']['num_cores']),
