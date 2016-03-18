@@ -33,15 +33,15 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Need to filter for on target only results somewhere as well
-        # callers = "freebayes, mutect, vardict, scalpel, platypus, pindel"
-        callers = "freebayes,mutect,vardict,scalpel"
+        callers = "freebayes,mutect,vardict,scalpel,platypus,pindel"
+        # callers = "freebayes,mutect,vardict,scalpel"
 
         merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, ("{}.freebayes.normalized.vcf".format(sample),
                                                                                            "{}.mutect.normalized.vcf".format(sample),
                                                                                            "{}.vardict.normalized.vcf".format(sample),
                                                                                            "{}.scalpel.normalized.vcf".format(sample),
-                                                                                           # "{}.platypus.normalized.vcf".format(sample),
-                                                                                           # "{}.pindel.normalized.vcf".format(sample)
+                                                                                           "{}.platypus.normalized.vcf".format(sample),
+                                                                                           "{}.pindel.normalized.vcf".format(sample)
                                                                                            ),
                                   cores=int(config['ensemble']['num_cores']),
                                   memory="{}G".format(config['ensemble']['max_mem']))
