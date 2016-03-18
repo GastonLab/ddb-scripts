@@ -80,12 +80,12 @@ if __name__ == "__main__":
 
         callers = "freebayes, mutect, vardict, scalpel, platypus, pindel"
 
-        merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
-                                                                                           normalization_job2.rv(),
-                                                                                           normalization_job3.rv(),
-                                                                                           normalization_job4.rv(),
-                                                                                           normalization_job5.rv(),
-                                                                                           normalization_job6.rv()))
+        # merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
+        #                                                                                    normalization_job2.rv(),
+        #                                                                                    normalization_job3.rv(),
+        #                                                                                    normalization_job4.rv(),
+        #                                                                                    normalization_job5.rv(),
+        #                                                                                    normalization_job6.rv()))
 
         # Removed temporarily until config generation script more easily adds in appropriate region files
         # on_target_job = Job.wrapJobFn(utilities.bcftools_filter_variants_regions, config, sample, samples,
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         spawn_normalization_job.addChild(normalization_job5)
         spawn_normalization_job.addChild(normalization_job6)
 
-        spawn_normalization_job.addFollowOn(merge_job)
+        # spawn_normalization_job.addFollowOn(merge_job)
 
         # merge_job.addChild(gatk_annotate_job)
         # on_target_job.addChild(gatk_annotate_job)
