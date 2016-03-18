@@ -12,7 +12,6 @@ from ddb import configuration
 from ddb_ngsflow import gatk
 from ddb_ngsflow import annotation
 from ddb_ngsflow import pipeline
-from ddb_ngsflow.variation import variation
 
 
 if __name__ == "__main__":
@@ -51,11 +50,17 @@ if __name__ == "__main__":
                                    cores=int(config['gatk']['num_cores']),
                                    memory="{}G".format(config['gemini']['max_mem']))
 
+        vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample,
+                                    "{}.snpEff.{}.vcf".format(sample, config['snpeff']['reference']),
+                                    cores=int(config['vcfanno']['num_cores']),
+                                    memory="{}G".format(config['vcfanno']['max_mem']))
+
         # Create workflow from created jobs
         root_job.addChild(gatk_annotate_job)
         gatk_annotate_job.addChild(gatk_filter_job)
         gatk_filter_job.addChild(snpeff_job)
         snpeff_job.addChild(gemini_job)
+        gemini_job.addChild(vcfanno_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
