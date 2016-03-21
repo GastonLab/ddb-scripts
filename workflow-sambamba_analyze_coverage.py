@@ -28,13 +28,11 @@ if __name__ == "__main__":
     samples = configuration.configure_samples(args.samples_file, config)
 
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs)
-
-    for sample in samples:
-        summary_job = Job.wrapJobFn(utilities.sambamba_coverage_summary, config, samples,
-                                    "sambamba_coverage_summary.txt",
-                                    cores=int(config['gatk']['num_cores']),
-                                    memory="{}G".format(config['gatk']['max_mem']))
-        root_job.addChild(summary_job)
+    summary_job = Job.wrapJobFn(utilities.sambamba_coverage_summary, config, samples,
+                                "sambamba_coverage_summary.txt",
+                                cores=int(config['gatk']['num_cores']),
+                                memory="{}G".format(config['gatk']['max_mem']))
+    root_job.addChild(summary_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
