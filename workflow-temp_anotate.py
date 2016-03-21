@@ -37,10 +37,6 @@ if __name__ == "__main__":
                                    cores=int(config['snpeff']['num_cores']),
                                    memory="{}G".format(config['snpeff']['max_mem']))
 
-        gemini_job = Job.wrapJobFn(annotation.gemini, config, sample, snpeff_job.rv(),
-                                   cores=int(config['gatk']['num_cores']),
-                                   memory="{}G".format(config['gemini']['max_mem']))
-
         vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample,
                                     "{}.snpEff.{}.vcf".format(sample, config['snpeff']['reference']),
                                     cores=int(config['vcfanno']['num_cores']),
@@ -48,8 +44,7 @@ if __name__ == "__main__":
 
         # Create workflow from created jobs
         root_job.addChild(snpeff_job)
-        snpeff_job.addChild(gemini_job)
-        gemini_job.addChild(vcfanno_job)
+        snpeff_job.addChild(vcfanno_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
