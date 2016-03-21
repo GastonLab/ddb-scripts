@@ -33,16 +33,7 @@ if __name__ == "__main__":
 
     # Per sample jobs
     for sample in samples:
-        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, "{}.merged.sorted.vcf".format(sample),
-                                          "{}.recalibrated.sorted.bam".format(sample),
-                                          cores=int(config['gatk']['num_cores']),
-                                          memory="{}G".format(config['gatk']['max_mem']))
-
-        gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, sample, gatk_annotate_job.rv(),
-                                        cores=1,
-                                        memory="{}G".format(config['gatk']['max_mem']))
-
-        snpeff_job = Job.wrapJobFn(annotation.snpeff, config, sample, gatk_filter_job.rv(),
+        snpeff_job = Job.wrapJobFn(annotation.snpeff, config, sample, "{}.filtered.vcf".format(sample),
                                    cores=int(config['snpeff']['num_cores']),
                                    memory="{}G".format(config['snpeff']['max_mem']))
 
@@ -56,9 +47,7 @@ if __name__ == "__main__":
                                     memory="{}G".format(config['vcfanno']['max_mem']))
 
         # Create workflow from created jobs
-        root_job.addChild(gatk_annotate_job)
-        gatk_annotate_job.addChild(gatk_filter_job)
-        gatk_filter_job.addChild(snpeff_job)
+        root_job.addChild(snpeff_job)
         snpeff_job.addChild(gemini_job)
         gemini_job.addChild(vcfanno_job)
 
