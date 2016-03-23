@@ -17,6 +17,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--samples_file', help="Input configuration file for samples")
     parser.add_argument('-c', '--configuration', help="Configuration file for various settings")
+    parser.add_argument('-o', '--outfile', help="Sample level statistics file")
+    parser.add_argument('-x', '--summary_file', help="File name for summary statistics file")
     Job.Runner.addToilOptions(parser)
     args = parser.parse_args()
     # args.logLevel = "INFO"
@@ -29,7 +31,7 @@ if __name__ == "__main__":
 
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs)
     summary_job = Job.wrapJobFn(utilities.sambamba_coverage_summary, config, samples,
-                                "sambamba_coverage_summary.txt",
+                                args.summary_file, args.outfile,
                                 cores=int(config['gatk']['num_cores']),
                                 memory="{}G".format(config['gatk']['max_mem']))
     root_job.addChild(summary_job)
