@@ -37,31 +37,43 @@ if __name__ == "__main__":
         # Need to filter for on target only results somewhere as well
         spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
         normalization_job1 = Job.wrapJobFn(variation.vt_normalization, config, sample, "mutect",
-                                           samples[sample]['mutect'],
+                                           "{}.mutect.normalized.vcf".format(sample),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job2 = Job.wrapJobFn(variation.vt_normalization, config, sample, "scalpel",
-                                           samples[sample]['scalpel'],
+                                           "{}.scalpel.normalized.vcf".format(sample),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job3 = Job.wrapJobFn(variation.vt_normalization, config, sample, "freebayes",
-                                           samples[sample]['freebayes'],
+                                           "{}.freebayes.normalized.vcf".format(sample),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job4 = Job.wrapJobFn(variation.vt_normalization, config, sample, "vardict",
-                                           samples[sample]['vardict'],
+                                           "{}.vardict.normalized.vcf".format(sample),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
-        callers = "mutect,scalpel,freebayes,vardict"
+        normalization_job5 = Job.wrapJobFn(variation.vt_normalization, config, sample, "platypus",
+                                           "{}.platypus.normalized.vcf".format(sample),
+                                           cores=1,
+                                           memory="{}G".format(config['gatk']['max_mem']))
+
+        normalization_job6 = Job.wrapJobFn(variation.vt_normalization, config, sample, "pindel",
+                                           "{}.pindel.normalized.vcf".format(sample),
+                                           cores=1,
+                                           memory="{}G".format(config['gatk']['max_mem']))
+
+        callers = "mutect,scalpel,freebayes,vardict,platypus,pindel"
 
         merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
                                                                                            normalization_job2.rv(),
                                                                                            normalization_job3.rv(),
-                                                                                           normalization_job4.rv()))
+                                                                                           normalization_job4.rv(),
+                                                                                           normalization_job5.rv(),
+                                                                                           normalization_job6.rv()))
 
         gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(), samples[sample]['bam'],
                                           cores=int(config['gatk']['num_cores']),
@@ -79,6 +91,11 @@ if __name__ == "__main__":
                                    cores=int(config['gatk']['num_cores']),
                                    memory="{}G".format(config['gemini']['max_mem']))
 
+        vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample,
+                                    "{}.snpEff.{}.vcf".format(sample, config['snpeff']['reference']),
+                                    cores=int(config['vcfanno']['num_cores']),
+                                    memory="{}G".format(config['vcfanno']['max_mem']))
+
         # Create workflow from created jobs
         root_job.addChild(spawn_variant_job)
 
@@ -86,13 +103,14 @@ if __name__ == "__main__":
         spawn_variant_job.addChild(normalization_job2)
         spawn_variant_job.addChild(normalization_job3)
         spawn_variant_job.addChild(normalization_job4)
+        spawn_variant_job.addChild(normalization_job5)
+        spawn_variant_job.addChild(normalization_job6)
         spawn_variant_job.addFollowOn(merge_job)
 
         merge_job.addChild(gatk_annotate_job)
-        # on_target_job.addChild(gatk_annotate_job)
         gatk_annotate_job.addChild(gatk_filter_job)
         gatk_filter_job.addChild(snpeff_job)
-        snpeff_job.addChild(gemini_job)
+        snpeff_job.addChild(vcfanno_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
