@@ -75,7 +75,8 @@ if __name__ == "__main__":
         #                                                                                    normalization_job5.rv(),
         #                                                                                    normalization_job6.rv()))
 
-        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, "{}.merged.vcf", samples[sample]['bam'],
+        gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, "{}.merged.vcf".format(sample),
+                                          samples[sample]['bam'],
                                           cores=int(config['gatk']['num_cores']),
                                           memory="{}G".format(config['gatk']['max_mem']))
 
