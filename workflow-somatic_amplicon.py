@@ -20,8 +20,6 @@ from ddb_ngsflow.variation import mutect
 from ddb_ngsflow.variation import platypus
 from ddb_ngsflow.variation import vardict
 from ddb_ngsflow.variation import scalpel
-from ddb_ngsflow.variation import pisces
-from ddb_ngsflow.variation.sv import scanindel
 from ddb_ngsflow.variation.sv import pindel
 
 
@@ -158,9 +156,9 @@ if __name__ == "__main__":
                                    cores=int(config['snpeff']['num_cores']),
                                    memory="{}G".format(config['snpeff']['max_mem']))
 
-        gemini_job = Job.wrapJobFn(annotation.gemini, config, sample, snpeff_job.rv(),
-                                   cores=int(config['gatk']['num_cores']),
-                                   memory="{}G".format(config['gemini']['max_mem']))
+        vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample, snpeff_job.rv(),
+                                    cores=int(config['vcfanno']['num_cores']),
+                                    memory="{}G".format(config['vcfanno']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(align_job)
@@ -195,7 +193,7 @@ if __name__ == "__main__":
         # on_target_job.addChild(gatk_annotate_job)
         gatk_annotate_job.addChild(gatk_filter_job)
         gatk_filter_job.addChild(snpeff_job)
-        snpeff_job.addChild(gemini_job)
+        snpeff_job.addChild(vcfanno_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)

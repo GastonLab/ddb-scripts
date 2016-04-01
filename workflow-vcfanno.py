@@ -33,6 +33,7 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample,
+                                    samples[sample].get('annotated_vcf') or
                                     "{}.snpEff.{}.vcf".format(sample, config['snpeff']['reference']),
                                     cores=int(config['vcfanno']['num_cores']),
                                     memory="{}G".format(config['vcfanno']['max_mem']))

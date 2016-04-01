@@ -38,35 +38,43 @@ if __name__ == "__main__":
 
     # Per sample variant calling jobs
     for sample in samples:
-        freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample, samples[sample]['bam'],
+        freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample,
+                                      samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                       cores=1,
                                       memory="{}G".format(config['freebayes']['max_mem']))
 
-        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples, samples[sample]['bam'],
+        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples,
+                                   samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                    cores=1,
                                    memory="{}G".format(config['mutect']['max_mem']))
 
-        mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples[sample]['bam'],
+        mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample,
+                                    samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                     cores=1,
                                     memory="{}G".format(config['mutect']['max_mem']))
 
-        vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples, samples[sample]['bam'],
+        vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples,
+                                    samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['vardict']['num_cores']),
                                     memory="{}G".format(config['vardict']['max_mem']))
 
-        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples, samples[sample]['bam'],
+        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples,
+                                    samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['scalpel']['num_cores']),
                                     memory="{}G".format(config['scalpel']['max_mem']))
 
-        scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples, samples[sample]['bam'],
+        scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples,
+                                      samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                       cores=int(config['scanindel']['num_cores']),
                                       memory="{}G".format(config['scanindel']['max_mem']))
 
-        platypus_job = Job.wrapJobFn(platypus.platypus_single, config, sample, samples, samples[sample]['bam'],
+        platypus_job = Job.wrapJobFn(platypus.platypus_single, config, sample, samples,
+                                     samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                      cores=int(config['platypus']['num_cores']),
                                      memory="{}G".format(config['platypus']['max_mem']))
 
-        pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample, samples[sample]['bam'],
+        pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample,
+                                   samples[sample].get('bam') or "{}.recalibrated.sorted.bam".format(sample),
                                    cores=int(config['pindel']['num_cores']),
                                    memory="{}G".format(config['pindel']['max_mem']))
 
