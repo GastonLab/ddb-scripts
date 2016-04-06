@@ -68,7 +68,8 @@ if __name__ == "__main__":
         # Create workflow from created jobs
         root_job.addChild(align_job)
         align_job.addChild(add_job)
-        add_job.addChild(creator_job)
+        add_job.addChild(dedup_job)
+        dedup_job.addChild(creator_job)
         creator_job.addChild(realign_job)
         realign_job.addChild(recal_job)
         recal_job.addChild(haplotypecaller_job)
