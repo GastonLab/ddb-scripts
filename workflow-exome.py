@@ -61,7 +61,8 @@ if __name__ == "__main__":
                                   cores=int(config['gatk']['num_cores']),
                                   memory="{}G".format(config['gatk']['max_mem']))
         # Variant Calling
-        haplotypecaller_job = Job.wrapJobFn(haplotypecaller.haplotypecaller_single, config, sample, recal_job.rv(),
+        haplotypecaller_job = Job.wrapJobFn(haplotypecaller.haplotypecaller_single, config, sample, samples,
+                                            recal_job.rv(),
                                             cores=1,
                                             memory="{}G".format(config['freebayes']['max_mem']))
 
