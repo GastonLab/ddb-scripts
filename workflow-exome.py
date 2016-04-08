@@ -87,7 +87,7 @@ if __name__ == "__main__":
     for sample in samples:
         sample = "{}.recalibrated.sorted.bam".format(sample)
         sample_inputs.append(sample)
-    sample_bam_string = "-I ".join(sample_inputs)
+    sample_bam_string = " -I ".join(sample_inputs)
 
     gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, config['project'], normalization_job.rv(), sample_bam_string,
                                       cores=int(config['gatk']['num_cores']),
