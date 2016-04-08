@@ -68,7 +68,7 @@ if __name__ == "__main__":
                                       cores=1,
                                       memory="{}G".format(config['freebayes']['max_mem']))
 
-        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, recal_job.rv(),
+        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples, recal_job.rv(),
                                    cores=1,
                                    memory="{}G".format(config['mutect']['max_mem']))
 
