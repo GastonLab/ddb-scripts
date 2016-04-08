@@ -49,29 +49,29 @@ if __name__ == "__main__":
         #
         # add_job = Job.wrapJobFn(gatk.add_or_replace_readgroups, config, sample, align_job.rv(),
         #                         cores=1,
-        #                         memory="{}G".format(config['gatk']['max_mem']))
+        #                         memory="{}G".format(config['picard-add']['max_mem']))
         #
         # creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample, add_job.rv(),
-        #                             cores=int(config['gatk']['num_cores']),
-        #                             memory="{}G".format(config['gatk']['max_mem']))
+        #                             cores=int(config['gatk-realign']['num_cores']),
+        #                             memory="{}G".format(config['gatk-realign']['max_mem']))
         #
         # realign_job = Job.wrapJobFn(gatk.realign_indels, config, sample, add_job.rv(), creator_job.rv(),
         #                             cores=1,
-        #                             memory="{}G".format(config['gatk']['max_mem']))
+        #                             memory="{}G".format(config['gatk-realign']['max_mem']))
         #
         # recal_job = Job.wrapJobFn(gatk.recalibrator, config, sample, realign_job.rv(),
-        #                           cores=int(config['gatk']['num_cores']),
-        #                           memory="{}G".format(config['gatk']['max_mem']))
+        #                           cores=int(config['gatk-recal']['num_cores']),
+        #                           memory="{}G".format(config['gatk-recal']['max_mem']))
         # # Variant Calling
-        # spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
+        spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
         # freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample, recal_job.rv(),
         #                               cores=1,
         #                               memory="{}G".format(config['freebayes']['max_mem']))
 
-        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples,
-                                   "{}.recalibrated.sorted.bam".format(sample),
-                                   cores=1,
-                                   memory="{}G".format(config['mutect']['max_mem']))
+        # mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples,
+        #                            "{}.recalibrated.sorted.bam".format(sample),
+        #                            cores=1,
+        #                            memory="{}G".format(config['mutect']['max_mem']))
 
         # mutect2_job = Job.wrapJobFn(mutect.mutect2_single, config, sample, samples, recal_job.rv(),
         #                             cores="{}G".format(config['gatk3.5']['max_mem'],
@@ -81,9 +81,9 @@ if __name__ == "__main__":
         #                             cores=int(config['vardict']['num_cores']),
         #                             memory="{}G".format(config['vardict']['max_mem']))
         #
-        # scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples, recal_job.rv(),
-        #                             cores=int(config['scalpel']['num_cores']),
-        #                             memory="{}G".format(config['scalpel']['max_mem']))
+        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples, recal_job.rv(),
+                                    cores=int(config['scalpel']['num_cores']),
+                                    memory="{}G".format(config['scalpel']['max_mem']))
 
         # scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples, recal_job.rv(),
         #                               cores=int(config['scanindel']['num_cores']),
@@ -135,7 +135,7 @@ if __name__ == "__main__":
         #                                    cores=1,
         #                                    memory="{}G".format(config['gatk']['max_mem']))
 
-        callers = "freebayes, mutect, vardict, scalpel, platypus, pindel"
+        callers = "freebayes,mutect,vardict,scalpel,platypus,pindel"
 
         merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
                                                                                            normalization_job2.rv(),
@@ -146,12 +146,12 @@ if __name__ == "__main__":
 
         gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(),
                                           "{}.recalibrated.sorted.bam".format(sample),
-                                          cores=int(config['gatk']['num_cores']),
-                                          memory="{}G".format(config['gatk']['max_mem']))
+                                          cores=int(config['gatk-annotate']['num_cores']),
+                                          memory="{}G".format(config['gatk-annotate']['max_mem']))
 
         gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, sample, gatk_annotate_job.rv(),
                                         cores=1,
-                                        memory="{}G".format(config['gatk']['max_mem']))
+                                        memory="{}G".format(config['gatk-filter']['max_mem']))
 
         snpeff_job = Job.wrapJobFn(annotation.snpeff, config, sample, gatk_filter_job.rv(),
                                    cores=int(config['snpeff']['num_cores']),
@@ -179,9 +179,10 @@ if __name__ == "__main__":
         # spawn_variant_job.addChild(platypus_job)
         # spawn_variant_job.addChild(pindel_job)
 
-        # spawn_variant_job.addFollowOn(spawn_normalization_job)
-        root_job.addChild(mutect_job)
-        root_job.addFollowOn(spawn_normalization_job)
+        root_job.addChild(spawn_variant_job)
+        spawn_variant_job.addChild(scalpel_job)
+
+        spawn_variant_job.addFollowOn(spawn_normalization_job)
 
         spawn_normalization_job.addChild(normalization_job1)
         spawn_normalization_job.addChild(normalization_job2)
