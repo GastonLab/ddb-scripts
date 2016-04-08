@@ -76,7 +76,7 @@ if __name__ == "__main__":
     #     recal_job.addChild(haplotypecaller_job)
     #
     # # Need to filter for on target only results somewhere as well
-    # joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, sample, samples)
+    # joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, config['project'], samples)
 
     normalization_job = Job.wrapJobFn(variation.vt_normalization, config, config['project'], "hc",
                                       "{}.haplotypecaller.vcf".format(config['project']),
