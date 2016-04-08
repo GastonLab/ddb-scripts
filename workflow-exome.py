@@ -78,7 +78,7 @@ if __name__ == "__main__":
     # # Need to filter for on target only results somewhere as well
     # joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, sample, samples)
 
-    normalization_job = Job.wrapJobFn(variation.vt_normalization, config, sample, "hc",
+    normalization_job = Job.wrapJobFn(variation.vt_normalization, config, config['project'], "hc",
                                       "{}.haplotypecaller.vcf".format(config['project']),
                                       cores=1,
                                       memory="{}G".format(config['gatk']['max_mem']))
@@ -89,19 +89,19 @@ if __name__ == "__main__":
         sample_inputs.append(sample)
     sample_bam_string = "-I ".join(sample_inputs)
 
-    gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, normalization_job.rv(), sample_bam_string,
+    gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, config['project'], normalization_job.rv(), sample_bam_string,
                                       cores=int(config['gatk']['num_cores']),
                                       memory="{}G".format(config['gatk']['max_mem']))
 
-    gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, sample, gatk_annotate_job.rv(),
+    gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, config['project'], gatk_annotate_job.rv(),
                                     cores=1,
                                     memory="{}G".format(config['gatk']['max_mem']))
 
-    snpeff_job = Job.wrapJobFn(annotation.snpeff, config, sample, gatk_filter_job.rv(),
+    snpeff_job = Job.wrapJobFn(annotation.snpeff, config, config['project'], gatk_filter_job.rv(),
                                cores=int(config['snpeff']['num_cores']),
                                memory="{}G".format(config['snpeff']['max_mem']))
 
-    gemini_job = Job.wrapJobFn(annotation.gemini, config, sample, gatk_filter_job.rv(),
+    gemini_job = Job.wrapJobFn(annotation.gemini, config, config['project'], gatk_filter_job.rv(),
                                cores=int(config['snpeff']['num_cores']),
                                memory="{}G".format(config['snpeff']['max_mem']))
 
