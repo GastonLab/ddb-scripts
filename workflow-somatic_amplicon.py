@@ -77,14 +77,15 @@ if __name__ == "__main__":
         #                             cores="{}G".format(config['gatk3.5']['max_mem'],
         #                             memory="{}G".format(config['gatk3.5']['max_mem']))
         #
-        # vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples, recal_job.rv(),
-        #                             cores=int(config['vardict']['num_cores']),
-        #                             memory="{}G".format(config['vardict']['max_mem']))
-        #
-        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples,
+        vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples,
                                     "{}.recalibrated.sorted.bam".format(sample),
-                                    cores=int(config['scalpel']['num_cores']),
-                                    memory="{}G".format(config['scalpel']['max_mem']))
+                                    cores=int(config['vardict']['num_cores']),
+                                    memory="{}G".format(config['vardict']['max_mem']))
+
+        # scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples,
+        #                             "{}.recalibrated.sorted.bam".format(sample),
+        #                             cores=int(config['scalpel']['num_cores']),
+        #                             memory="{}G".format(config['scalpel']['max_mem']))
 
         # scanindel_job = Job.wrapJobFn(scanindel.scanindel, config, sample, samples, recal_job.rv(),
         #                               cores=int(config['scanindel']['num_cores']),
@@ -164,6 +165,7 @@ if __name__ == "__main__":
 
         # Create workflow from created jobs
         # root_job.addChild(align_job)
+        root_job.addChild(spawn_variant_job)
         # align_job.addChild(add_job)
         # add_job.addChild(creator_job)
         # creator_job.addChild(realign_job)
@@ -174,14 +176,11 @@ if __name__ == "__main__":
         # spawn_variant_job.addChild(freebayes_job)
         # spawn_variant_job.addChild(mutect_job)
         # # spawn_variant_job.addChild(mutect2_job)
-        # spawn_variant_job.addChild(vardict_job)
+        spawn_variant_job.addChild(vardict_job)
         # spawn_variant_job.addChild(scalpel_job)
         # # spawn_variant_job.addChild(scanindel_job)
         # spawn_variant_job.addChild(platypus_job)
         # spawn_variant_job.addChild(pindel_job)
-
-        root_job.addChild(spawn_variant_job)
-        spawn_variant_job.addChild(scalpel_job)
 
         spawn_variant_job.addFollowOn(spawn_normalization_job)
 
@@ -195,7 +194,6 @@ if __name__ == "__main__":
         spawn_normalization_job.addFollowOn(merge_job)
 
         merge_job.addChild(gatk_annotate_job)
-        # on_target_job.addChild(gatk_annotate_job)
         gatk_annotate_job.addChild(gatk_filter_job)
         gatk_filter_job.addChild(snpeff_job)
         snpeff_job.addChild(vcfanno_job)
