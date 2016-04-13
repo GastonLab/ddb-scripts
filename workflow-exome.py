@@ -67,13 +67,13 @@ if __name__ == "__main__":
                                             memory="{}G".format(config['gatk-haplotypecaller']['max_mem']))
 
         # Create workflow from created jobs
-        root_job.addChild(align_job)
-        align_job.addChild(add_job)
-        add_job.addChild(dedup_job)
-        dedup_job.addChild(creator_job)
-        creator_job.addChild(realign_job)
-        realign_job.addChild(recal_job)
-        recal_job.addChild(haplotypecaller_job)
+        # root_job.addChild(align_job)
+        # align_job.addChild(add_job)
+        # add_job.addChild(dedup_job)
+        # dedup_job.addChild(creator_job)
+        # creator_job.addChild(realign_job)
+        # realign_job.addChild(recal_job)
+        # recal_job.addChild(haplotypecaller_job)
 
     # Need to filter for on target only results somewhere as well
     joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, config['project'], samples,
@@ -103,7 +103,8 @@ if __name__ == "__main__":
                                cores=int(config['snpeff']['num_cores']),
                                memory="{}G".format(config['snpeff']['max_mem']))
 
-    root_job.addFollowOn(joint_call_job)
+    # root_job.addFollowOn(joint_call_job)
+    root_job.addChild(joint_call_job)
     joint_call_job.addChild(normalization_job)
     normalization_job.addChild(gatk_annotate_job)
     gatk_annotate_job.addChild(gatk_filter_job)
