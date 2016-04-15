@@ -43,27 +43,27 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        # align_job = Job.wrapJobFn(bwa.run_bwa_mem, config, sample, samples,
-        #                           cores=int(config['bwa']['num_cores']),
-        #                           memory="{}G".format(config['bwa']['max_mem']))
-        #
-        # add_job = Job.wrapJobFn(gatk.add_or_replace_readgroups, config, sample, align_job.rv(),
-        #                         cores=1,
-        #                         memory="{}G".format(config['picard-add']['max_mem']))
-        #
-        # creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample, add_job.rv(),
-        #                             cores=int(config['gatk-realign']['num_cores']),
-        #                             memory="{}G".format(config['gatk-realign']['max_mem']))
-        #
-        # realign_job = Job.wrapJobFn(gatk.realign_indels, config, sample, add_job.rv(), creator_job.rv(),
-        #                             cores=1,
-        #                             memory="{}G".format(config['gatk-realign']['max_mem']))
-        #
-        # recal_job = Job.wrapJobFn(gatk.recalibrator, config, sample, realign_job.rv(),
-        #                           cores=int(config['gatk-recal']['num_cores']),
-        #                           memory="{}G".format(config['gatk-recal']['max_mem']))
-        #
-        # # Variant Calling
+        align_job = Job.wrapJobFn(bwa.run_bwa_mem, config, sample, samples,
+                                  cores=int(config['bwa']['num_cores']),
+                                  memory="{}G".format(config['bwa']['max_mem']))
+
+        add_job = Job.wrapJobFn(gatk.add_or_replace_readgroups, config, sample, align_job.rv(),
+                                cores=1,
+                                memory="{}G".format(config['picard-add']['max_mem']))
+
+        creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample, add_job.rv(),
+                                    cores=int(config['gatk-realign']['num_cores']),
+                                    memory="{}G".format(config['gatk-realign']['max_mem']))
+
+        realign_job = Job.wrapJobFn(gatk.realign_indels, config, sample, add_job.rv(), creator_job.rv(),
+                                    cores=1,
+                                    memory="{}G".format(config['gatk-realign']['max_mem']))
+
+        recal_job = Job.wrapJobFn(gatk.recalibrator, config, sample, realign_job.rv(),
+                                  cores=int(config['gatk-recal']['num_cores']),
+                                  memory="{}G".format(config['gatk-recal']['max_mem']))
+
+        # Variant Calling
         spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
         freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample,
                                       "{}.recalibrated.sorted.bam".format(sample),
@@ -156,15 +156,14 @@ if __name__ == "__main__":
                                     memory="{}G".format(config['vcfanno']['max_mem']))
 
         # Create workflow from created jobs
-        # root_job.addChild(align_job)
-        # align_job.addChild(add_job)
-        # add_job.addChild(creator_job)
-        # creator_job.addChild(realign_job)
-        # realign_job.addChild(recal_job)
-        #
-        # recal_job.addChild(spawn_variant_job)
+        root_job.addChild(align_job)
+        align_job.addChild(add_job)
+        add_job.addChild(creator_job)
+        creator_job.addChild(realign_job)
+        realign_job.addChild(recal_job)
 
-        root_job.addChild(spawn_variant_job)
+        recal_job.addChild(spawn_variant_job)
+
         spawn_variant_job.addChild(freebayes_job)
         spawn_variant_job.addChild(mutect_job)
         spawn_variant_job.addChild(vardict_job)
