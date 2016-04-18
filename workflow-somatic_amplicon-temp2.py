@@ -130,12 +130,13 @@ if __name__ == "__main__":
         #
         callers = "freebayes,mutect,vardict,scalpel,platypus,pindel"
 
-        merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
-                                                                                           normalization_job2.rv(),
-                                                                                           normalization_job3.rv(),
-                                                                                           normalization_job4.rv(),
-                                                                                           normalization_job5.rv(),
-                                                                                           normalization_job6.rv()))
+        merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample,
+                                  callers, ("{}.mutect.normalized.vcf".format(sample),
+                                            "{}.freebayes.normalized.vcf".format(sample),
+                                            "{}.scalpel.normalized.vcf".format(sample),
+                                            "{}.platypus.normalized.vcf".format(sample),
+                                            "{}.pindel.normalized.vcf".format(sample),
+                                            "{}.vardict.normalized.vcf".format(sample)))
 
         gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(),
                                           "{}.recalibrated.sorted.bam".format(sample),
