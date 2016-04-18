@@ -79,7 +79,7 @@ if __name__ == "__main__":
                                     "{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['vardict']['num_cores']),
                                     memory="{}G".format(config['vardict']['max_mem']))
-        
+
         scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples,
                                     "{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['scalpel']['num_cores']),
