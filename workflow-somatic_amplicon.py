@@ -150,7 +150,7 @@ if __name__ == "__main__":
                                    cores=int(config['snpeff']['num_cores']),
                                    memory="{}G".format(config['snpeff']['max_mem']))
 
-        vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample,
+        vcfanno_job = Job.wrapJobFn(annotation.vcfanno, config, sample, samples,
                                     "{}.snpEff.{}.vcf".format(sample, config['snpeff']['reference']),
                                     cores=int(config['vcfanno']['num_cores']),
                                     memory="{}G".format(config['vcfanno']['max_mem']))
