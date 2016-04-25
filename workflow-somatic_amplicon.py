@@ -11,10 +11,10 @@ from toil.job import Job
 from ddb import configuration
 from ddb_ngsflow import gatk
 from ddb_ngsflow import annotation
-from ddb_ngsflow.align import bwa
 from ddb_ngsflow import pipeline
+from ddb_ngsflow.align import bwa
+from ddb_ngsflow.utils import utilities
 from ddb_ngsflow.variation import variation
-
 from ddb_ngsflow.variation import freebayes
 from ddb_ngsflow.variation import mutect
 from ddb_ngsflow.variation import platypus
@@ -65,6 +65,11 @@ if __name__ == "__main__":
 
         # Variant Calling
         spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
+        coverage_job = Job.wrapJobFn(utilities.sambamba_region_coverage, config, sample, samples,
+                                     "{}.recalibrated.sorted.bam".format(sample),
+                                     cores=int(config['gatk']['num_cores']),
+                                     memory="{}G".format(config['gatk']['max_mem']))
+
         freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample,
                                       "{}.recalibrated.sorted.bam".format(sample),
                                       cores=1,
@@ -164,6 +169,7 @@ if __name__ == "__main__":
 
         recal_job.addChild(spawn_variant_job)
 
+        spawn_variant_job.addChild(coverage_job)
         spawn_variant_job.addChild(freebayes_job)
         spawn_variant_job.addChild(mutect_job)
         spawn_variant_job.addChild(vardict_job)
