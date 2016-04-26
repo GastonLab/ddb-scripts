@@ -40,6 +40,8 @@ if __name__ == "__main__":
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
 
+    fastqc_job = Job.wrapJobFn(utilities.run_fastqc, config, samples)
+
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
@@ -193,5 +195,6 @@ if __name__ == "__main__":
         gatk_filter_job.addChild(snpeff_job)
         snpeff_job.addChild(vcfanno_job)
 
+    root_job.addFollowOn(fastqc_job)
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
