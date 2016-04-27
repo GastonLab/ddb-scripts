@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
         # Create workflow from created jobs
         root_job.addChild(spawn_variant_job)
-        
+
         spawn_variant_job.addChild(freebayes_job)
         spawn_variant_job.addChild(mutect_job)
         spawn_variant_job.addChild(vardict_job)
