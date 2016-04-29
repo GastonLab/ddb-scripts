@@ -79,32 +79,32 @@ if __name__ == "__main__":
         spawn_normalization_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
 
         normalization_job1 = Job.wrapJobFn(variation.vt_normalization, config, sample, "freebayes",
-                                           "{}.freebayes.vcf".format(sample),
+                                           "{}.freebayes.vcf".format(samples[sample]['library_name']),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job2 = Job.wrapJobFn(variation.vt_normalization, config, sample, "mutect",
-                                           "{}.mutect.vcf".format(sample),
+                                           "{}.mutect.vcf".format(samples[sample]['library_name']),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job3 = Job.wrapJobFn(variation.vt_normalization, config, sample, "vardict",
-                                           "{}.vardict.vcf".format(sample),
+                                           "{}.vardict.vcf".format(samples[sample]['library_name']),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job4 = Job.wrapJobFn(variation.vt_normalization, config, sample, "scalpel",
-                                           "{}.scalpel.vcf".format(sample),
+                                           "{}.scalpel.vcf".format(samples[sample]['library_name']),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job5 = Job.wrapJobFn(variation.vt_normalization, config, sample, "platypus",
-                                           "{}.platypus.vcf".format(sample),
+                                           "{}.platypus.vcf".format(samples[sample]['library_name']),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job6 = Job.wrapJobFn(variation.vt_normalization, config, sample, "pindel",
-                                           "{}.pindel.vcf".format(sample),
+                                           "{}.pindel.vcf".format(samples[sample]['library_name']),
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
