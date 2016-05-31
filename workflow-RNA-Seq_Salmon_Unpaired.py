@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        align_job = Job.wrapJobFn(salmon.salmon_unpaired, config, sample, samples,
+        align_job = Job.wrapJobFn(salmon.salmonEM_unpaired, config, sample, samples,
                                   cores=int(config['salmon']['num_cores']),
                                   memory="{}G".format(config['salmon']['max_mem']))
 
