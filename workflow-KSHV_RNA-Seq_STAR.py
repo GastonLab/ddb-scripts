@@ -37,14 +37,14 @@ if __name__ == "__main__":
         flags = list()
         flags.append("local")
 
-        align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples,
+        align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples, flags,
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
         outroot = align_job.rv()
         samples[sample]['fastq1'] = "{}Unmapped.out.mate1".format(outroot)
 
-        bowtie2_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples,
+        bowtie2_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
                                     cores=int(config['bowtie']['num_cores']),
                                     memory="{}G".format(config['bowtie']['max_mem']))
 
