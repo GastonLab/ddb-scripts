@@ -35,23 +35,13 @@ if __name__ == "__main__":
     for sample in samples:
         # Alignment and Refinement Stages
         # 1st Pass STAR
-        flags = list()
-        flags.append("local")
 
-        align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples,
+        align_job = Job.wrapJobFn(star.star_paired, config, sample, samples,
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
-        outroot = align_job.rv()
-        samples[sample]['fastq1'] = "{}Unmapped.out.mate1".format(outroot)
-
-        bowtie2_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples,
-                                    cores=int(config['bowtie']['num_cores']),
-                                    memory="{}G".format(config['bowtie']['max_mem']))
-
         # Create workflow from created jobs
         root_job.addChild(align_job)
-        align_job.addChild(bowtie2_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
