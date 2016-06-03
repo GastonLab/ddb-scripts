@@ -34,15 +34,14 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        flags = list()
-        flags.append("local")
+        flags = ("local", "2-pass")
 
         align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples, flags,
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
         outroot = align_job.rv()
-        samples[sample]['fastq1'] = "{}Unmapped.out.mate1".format(outroot)
+        samples[sample]['unmapped_fastq'] = "{}Unmapped.out.mate1".format(outroot)
 
         bowtie2_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
                                     cores=int(config['bowtie']['num_cores']),
