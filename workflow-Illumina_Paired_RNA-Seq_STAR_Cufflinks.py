@@ -33,7 +33,8 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        align_job = Job.wrapJobFn(star.star_unpaired_uncompressed_basic, config, sample, samples,
+        # 1st Pass STAR
+        align_job = Job.wrapJobFn(star.star_paired_compressed_basic, config, sample, samples,
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
