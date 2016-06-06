@@ -9,6 +9,7 @@ from toil.job import Job
 
 # Package methods
 from ddb import configuration
+from ddb_ngsflow import gatk
 from ddb_ngsflow import pipeline
 from ddb_ngsflow.rna import star
 from ddb_ngsflow.rna import bowtie
@@ -47,10 +48,28 @@ if __name__ == "__main__":
                                     cores=int(config['bowtie']['num_cores']),
                                     memory="{}G".format(config['bowtie']['max_mem']))
 
+        mapped_sams = [align_job.rv(), bowtie2_job.rv()]
+
+        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, mapped_sams,
+                               cores=int(config['picard-merge']['num_cores']),
+                               memory="{}G".format(config['picard-merge']['max_mem']))
+
+        # cufflinks_job = Job.wrapFn()
+        #
+        # cuffmerge_job = Job.wrapFn()
+        #
+        # cuffquant_job = Job.wrapFn()
+        #
+        # cuffnorm_job = Job.wrapFn()
+
         # Create workflow from created jobs
         root_job.addChild(align_job)
         align_job.addChild(bowtie2_job)
-
+        bowtie2_job.addChild(merge_job)
+        # merge_job.addChild(cufflinks_job)
+        # cufflinks_job.addChild(cuffmerge_job)
+        # cuffmerge_job.addChild(cuffquant_job)
+        # cuffquant_job.addChild(cuffnorm_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
