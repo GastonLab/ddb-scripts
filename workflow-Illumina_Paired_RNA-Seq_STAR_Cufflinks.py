@@ -36,7 +36,10 @@ if __name__ == "__main__":
         # Alignment and Refinement Stages
         # 1st Pass STAR
 
-        align_job = Job.wrapJobFn(star.star_paired, config, sample, samples,
+        flags = list()
+        flags.append("compressed")
+
+        align_job = Job.wrapJobFn(star.star_paired, config, sample, samples, flags,
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
