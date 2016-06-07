@@ -38,12 +38,12 @@ if __name__ == "__main__":
         # Merge alignments and run cufflinks
         input_bams = [samples[sample]['star'], samples[sample]['bowtie']]
         merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
-                               cores=int(config['picard-merge']['num_cores']),
-                               memory="{}G".format(config['picard-merge']['max_mem']))
+                                  cores=int(config['picard-merge']['num_cores']),
+                                  memory="{}G".format(config['picard-merge']['max_mem']))
 
         cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, merge_job.rv(),
-                                   cores=int(config['cufflinks']['num_cores']),
-                                   memory="{}G".format(config['cufflinks']['max_mem']))
+                                      cores=int(config['cufflinks']['num_cores']),
+                                      memory="{}G".format(config['cufflinks']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(merge_job)
