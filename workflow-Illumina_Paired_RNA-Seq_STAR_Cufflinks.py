@@ -11,7 +11,7 @@ from toil.job import Job
 from ddb import configuration
 from ddb_ngsflow import pipeline
 from ddb_ngsflow.rna import star
-from ddb_ngsflow.rna import bowtie
+from ddb_ngsflow.rna import cufflinks
 
 
 if __name__ == "__main__":
@@ -40,8 +40,13 @@ if __name__ == "__main__":
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
+        cufflinks_job = Job.wrapFn(cufflinks.cufflinks, config, sample, align_job.rv(),
+                                   cores=int(config['cufflinks']['num_cores']),
+                                   memory="{}G".format(config['cufflinks']['max_mem']))
+
         # Create workflow from created jobs
         root_job.addChild(align_job)
+        align_job.addChild(cufflinks_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
