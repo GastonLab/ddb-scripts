@@ -44,12 +44,13 @@ if __name__ == "__main__":
 
         outroot = align_job.rv()
         samples[sample]['unmapped_fastq'] = "{}Unmapped.out.mate1".format(outroot)
+        star_aligned_sam = "{}Aligned.out.sam".format(outroot)
 
         bowtie_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
                                    cores=int(config['bowtie']['num_cores']),
                                    memory="{}G".format(config['bowtie']['max_mem']))
 
-        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, [align_job.rv(), bowtie_job.rv()],
+        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, [star_aligned_sam, bowtie_job.rv()],
                                cores=int(config['picard-merge']['num_cores']),
                                memory="{}G".format(config['picard-merge']['max_mem']))
 

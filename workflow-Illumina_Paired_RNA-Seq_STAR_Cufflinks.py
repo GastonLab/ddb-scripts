@@ -43,7 +43,9 @@ if __name__ == "__main__":
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
-        cufflinks_job = Job.wrapFn(cufflinks.cufflinks, config, sample, align_job.rv(),
+        aligned_sam = "{}Aligned.out.sam".format(align_job.rv())
+
+        cufflinks_job = Job.wrapFn(cufflinks.cufflinks, config, sample, aligned_sam,
                                    cores=int(config['cufflinks']['num_cores']),
                                    memory="{}G".format(config['cufflinks']['max_mem']))
 
