@@ -73,7 +73,7 @@ if __name__ == "__main__":
     for sample in samples:
         cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
                                       cores=int(config['cuffquant']['num_cores']),
-                                      memory="{}G".format(config['cuffwuant']['max_mem']))
+                                      memory="{}G".format(config['cuffwqant']['max_mem']))
 
         cuffmerge_job.addChild(cuffquant_job)
 
