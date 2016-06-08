@@ -49,7 +49,7 @@ if __name__ == "__main__":
                                       cores=int(config['cufflinks']['num_cores']),
                                       memory="{}G".format(config['cufflinks']['max_mem']))
 
-        path = cufflinks_job.rv()
+        path = "{}/".format(cufflinks_job.rv())
         transcript_assemblies.append(os.path.join(path, "transcripts.gtf"))
 
         # Create workflow from created jobs
