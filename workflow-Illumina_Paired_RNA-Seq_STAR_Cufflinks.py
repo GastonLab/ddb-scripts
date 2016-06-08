@@ -43,15 +43,26 @@ if __name__ == "__main__":
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
-        aligned_sam = "{}Aligned.out.sam".format(align_job.rv())
-
-        cufflinks_job = Job.wrapFn(cufflinks.cufflinks, config, sample, aligned_sam,
+        cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
                                    cores=int(config['cufflinks']['num_cores']),
                                    memory="{}G".format(config['cufflinks']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(align_job)
         align_job.addChild(cufflinks_job)
+
+    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config,
+                                  cores=int(config['cuffmerge']['num_cores']),
+                                  memory="{}G".format(config['cuffmerge']['max_mem']))
+
+    root_job.addFollowOn(cuffmerge_job)
+
+    for sample in samples:
+        cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
+                                      cores=int(config['cuffquant']['num_cores']),
+                                      memory="{}G".format(config['cuffquant']['max_mem']))
+
+        cuffmerge_job.addChild(cuffquant_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
