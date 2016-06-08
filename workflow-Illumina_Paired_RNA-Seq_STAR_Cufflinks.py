@@ -44,8 +44,8 @@ if __name__ == "__main__":
                                   memory="{}G".format(config['star']['max_mem']))
 
         cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
-                                   cores=int(config['cufflinks']['num_cores']),
-                                   memory="{}G".format(config['cufflinks']['max_mem']))
+                                      cores=int(config['cufflinks']['num_cores']),
+                                      memory="{}G".format(config['cufflinks']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(align_job)
