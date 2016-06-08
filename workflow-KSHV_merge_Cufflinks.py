@@ -49,7 +49,8 @@ if __name__ == "__main__":
                                       cores=int(config['cufflinks']['num_cores']),
                                       memory="{}G".format(config['cufflinks']['max_mem']))
 
-        transcript_assemblies.append(os.path.join(cufflinks_job.rv(), "transcripts.gtf"))
+        path = cufflinks_job.rv()
+        transcript_assemblies.append(os.path.join(path, "transcripts.gtf"))
 
         # Create workflow from created jobs
         # root_job.addChild(merge_job)
