@@ -53,12 +53,7 @@ if __name__ == "__main__":
         # merge_job.addChild(cufflinks_job)
         root_job.addChild(cufflinks_job)
 
-    manifest_file = "transcript_assemblies.txt"
-    with open(manifest_file, 'w') as manifest:
-        for sample in samples:
-            manifest.write("{}\n".format(samples[sample]['cufflinks_assembly']))
-
-    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, manifest_file,
+    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config,
                                   cores=int(config['cuffmerge']['num_cores']),
                                   memory="{}G".format(config['cuffmerge']['max_mem']))
 
