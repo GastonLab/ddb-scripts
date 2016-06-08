@@ -35,7 +35,6 @@ if __name__ == "__main__":
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
 
     # Per sample jobs
-    transcript_assemblies = list()
     for sample in samples:
         # Merge alignments and run cufflinks
         # input_bams = [samples[sample]['star'], samples[sample]['bowtie']]
@@ -49,9 +48,6 @@ if __name__ == "__main__":
                                       cores=int(config['cufflinks']['num_cores']),
                                       memory="{}G".format(config['cufflinks']['max_mem']))
 
-        path = "{}/".format(cufflinks_job.rv())
-        transcript_assemblies.append(os.path.join(path, "transcripts.gtf"))
-
         # Create workflow from created jobs
         # root_job.addChild(merge_job)
         # merge_job.addChild(cufflinks_job)
@@ -59,8 +55,8 @@ if __name__ == "__main__":
 
     manifest_file = "transcript_assemblies.txt"
     with open(manifest_file, 'w') as manifest:
-        for assembly in transcript_assemblies:
-            manifest.write("{}\n".format(assembly))
+        for sample in samples:
+            manifest.write("{}\n".format(samples[sample]['cufflinks_assembly']))
 
     cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, manifest_file,
                                   cores=int(config['cuffmerge']['num_cores']),
