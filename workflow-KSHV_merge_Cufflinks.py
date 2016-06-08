@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Standard packages
+import os
 import sys
 import argparse
 
@@ -34,20 +35,46 @@ if __name__ == "__main__":
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
 
     # Per sample jobs
+    transcript_assemblies = list()
     for sample in samples:
         # Merge alignments and run cufflinks
-        input_bams = [samples[sample]['star'], samples[sample]['bowtie']]
-        merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
-                                  cores=int(config['picard-merge']['num_cores']),
-                                  memory="{}G".format(config['picard-merge']['max_mem']))
+        # input_bams = [samples[sample]['star'], samples[sample]['bowtie']]
+        # merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
+        #                           cores=int(config['picard-merge']['num_cores']),
+        #                           memory="{}G".format(config['picard-merge']['max_mem']))
+        #
+        # samples[sample]['bam'] = merge_job.rv()
 
-        cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, merge_job.rv(),
+        cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
                                       cores=int(config['cufflinks']['num_cores']),
                                       memory="{}G".format(config['cufflinks']['max_mem']))
 
+        transcript_assemblies.append(os.path.join(cufflinks_job.rv(), "transcripts.gtf"))
+
         # Create workflow from created jobs
-        root_job.addChild(merge_job)
-        merge_job.addChild(cufflinks_job)
+        # root_job.addChild(merge_job)
+        # merge_job.addChild(cufflinks_job)
+        root_job.addChild(cufflinks_job)
+
+    manifest_file = "transcript_assemblies.txt"
+    with open(manifest_file, 'w') as manifest:
+        for assembly in transcript_assemblies:
+            manifest.write("{}\n".format(assembly))
+
+    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, manifest_file,
+                                  cores=int(config['cuffmerge']['num_cores']),
+                                  memory="{}G".format(config['cuffmerge']['max_mem']))
+
+    root_job.addFollowOn(cuffmerge_job)
+    pwd = os.getcwd()
+    config['transcript_reference'] = os.path.join(pwd, "merged.gtf")
+
+    for sample in samples:
+        cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
+                                      cores=int(config['cuffquant']['num_cores']),
+                                      memory="{}G".format(config['cuffwuant']['max_mem']))
+
+        cuffmerge_job.addChild(cuffquant_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
