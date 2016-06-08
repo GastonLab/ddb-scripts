@@ -58,8 +58,6 @@ if __name__ == "__main__":
                                   memory="{}G".format(config['cuffmerge']['max_mem']))
 
     root_job.addFollowOn(cuffmerge_job)
-    pwd = os.getcwd()
-    config['transcript_reference'] = os.path.join(pwd, "merged.gtf")
 
     for sample in samples:
         cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
