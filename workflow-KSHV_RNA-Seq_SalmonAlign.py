@@ -36,7 +36,7 @@ if __name__ == "__main__":
         # Alignment and Refinement Stages
         flags = list()
 
-        quant_job = Job.wrapJobFn(salmon.salmonAlignEM(), config, sample, samples,
+        quant_job = Job.wrapJobFn(salmon.salmonAlignEM, config, sample, samples,
                                   cores=int(config['salmon']['num_cores']),
                                   memory="{}G".format(config['salmon']['max_mem']))
 
