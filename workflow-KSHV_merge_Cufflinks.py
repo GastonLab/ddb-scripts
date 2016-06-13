@@ -61,8 +61,6 @@ if __name__ == "__main__":
         cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
                                       cores=int(config['cuffquant']['num_cores']),
                                       memory="{}G".format(config['cuffquant']['max_mem']))
-
-        # cuffmerge_job.addChild(cuffquant_job)
         cuffmerge_job.addChild(cuffquant_job)
 
     # Start workflow execution

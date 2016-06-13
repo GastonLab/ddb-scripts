@@ -36,21 +36,20 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        flags = ("local", "2-pass")
+        flags = ("local", "unstranded", "removeNonCanonical", "2-stage", "cufflinks")
 
         align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples, flags,
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
-        outroot = align_job.rv()
-        samples[sample]['unmapped_fastq'] = "{}Unmapped.out.mate1".format(outroot)
-        star_aligned_sam = "{}Aligned.out.sam".format(outroot)
+        samples[sample]['star'] = "{}.star.Aligned.sortedByCoord.out.bam".format(sample)
+        samples[sample]['unmapped_fastq'] = "{}.star.Unmapped.out.mate1".format(sample)
 
         bowtie_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
                                    cores=int(config['bowtie']['num_cores']),
                                    memory="{}G".format(config['bowtie']['max_mem']))
 
-        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, [star_aligned_sam, bowtie_job.rv()],
+        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, [samples[sample]['star'], bowtie_job.rv()],
                                cores=int(config['picard-merge']['num_cores']),
                                memory="{}G".format(config['picard-merge']['max_mem']))
 
@@ -63,6 +62,18 @@ if __name__ == "__main__":
         align_job.addChild(bowtie_job)
         bowtie_job.addChild(merge_job)
         merge_job.addChild(cufflinks_job)
+
+    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, "blah", samples,
+                                  cores=int(config['cuffmerge']['num_cores']),
+                                  memory="{}G".format(config['cuffmerge']['max_mem']))
+
+    root_job.addFollowOn(cuffmerge_job)
+
+    for sample in samples:
+        cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
+                                      cores=int(config['cuffquant']['num_cores']),
+                                      memory="{}G".format(config['cuffquant']['max_mem']))
+        cuffmerge_job.addChild(cuffquant_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
