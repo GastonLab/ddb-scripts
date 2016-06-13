@@ -45,11 +45,11 @@ if __name__ == "__main__":
         samples[sample]['star'] = "{}.star.Aligned.sortedByCoord.out.bam".format(sample)
         samples[sample]['unmapped_fastq'] = "{}.star.Unmapped.out.mate1".format(sample)
 
-        bowtie_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
-                                   cores=int(config['bowtie']['num_cores']),
-                                   memory="{}G".format(config['bowtie']['max_mem']))
+        # bowtie_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
+        #                            cores=int(config['bowtie']['num_cores']),
+        #                            memory="{}G".format(config['bowtie']['max_mem']))
 
-        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, [samples[sample]['star'], bowtie_job.rv()],
+        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, [samples[sample]['star'], samples[sample]['bowtie']],
                                cores=int(config['picard-merge']['num_cores']),
                                memory="{}G".format(config['picard-merge']['max_mem']))
 
@@ -59,8 +59,9 @@ if __name__ == "__main__":
 
         # Create workflow from created jobs
         root_job.addChild(align_job)
-        align_job.addChild(bowtie_job)
-        bowtie_job.addChild(merge_job)
+        # align_job.addChild(bowtie_job)
+        # bowtie_job.addChild(merge_job)
+        align_job.addChild(merge_job)
         merge_job.addChild(cufflinks_job)
 
     cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, "blah", samples,
