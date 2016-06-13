@@ -49,7 +49,11 @@ if __name__ == "__main__":
         #                            cores=int(config['bowtie']['num_cores']),
         #                            memory="{}G".format(config['bowtie']['max_mem']))
 
-        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, [samples[sample]['star'], samples[sample]['bowtie']],
+        input_bams = list()
+        input_bams.append(samples[sample]['star'])
+        input_bams.append(samples[sample]['bowtie'])
+
+        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, input_bams,
                                cores=int(config['picard-merge']['num_cores']),
                                memory="{}G".format(config['picard-merge']['max_mem']))
 
