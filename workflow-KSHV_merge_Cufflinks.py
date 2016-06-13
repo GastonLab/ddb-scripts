@@ -42,8 +42,6 @@ if __name__ == "__main__":
                                   cores=int(config['picard-merge']['num_cores']),
                                   memory="{}G".format(config['picard-merge']['max_mem']))
 
-        samples[sample]['bam'] = merge_job.rv()
-
         cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
                                       cores=int(config['cufflinks']['num_cores']),
                                       memory="{}G".format(config['cufflinks']['max_mem']))
