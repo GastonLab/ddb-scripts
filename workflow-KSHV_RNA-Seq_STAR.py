@@ -68,7 +68,7 @@ if __name__ == "__main__":
         align_job.addChild(merge_job)
         merge_job.addChild(cufflinks_job)
 
-    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, "blah", samples,
+    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, "blah", samples, "manifest.txt",
                                   cores=int(config['cuffmerge']['num_cores']),
                                   memory="{}G".format(config['cuffmerge']['max_mem']))
 
