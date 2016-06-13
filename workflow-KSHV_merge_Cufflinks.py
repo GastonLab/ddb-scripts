@@ -35,29 +35,29 @@ if __name__ == "__main__":
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
 
     # Per sample jobs
-    # for sample in samples:
+    for sample in samples:
         # Merge alignments and run cufflinks
-        # input_bams = [samples[sample]['star'], samples[sample]['bowtie']]
-        # merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
-        #                           cores=int(config['picard-merge']['num_cores']),
-        #                           memory="{}G".format(config['picard-merge']['max_mem']))
-        #
-        # samples[sample]['bam'] = merge_job.rv()
+        input_bams = [samples[sample]['star'], samples[sample]['bowtie']]
+        merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
+                                  cores=int(config['picard-merge']['num_cores']),
+                                  memory="{}G".format(config['picard-merge']['max_mem']))
 
-        # cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
-        #                               cores=int(config['cufflinks']['num_cores']),
-        #                               memory="{}G".format(config['cufflinks']['max_mem']))
+        samples[sample]['bam'] = merge_job.rv()
+
+        cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
+                                      cores=int(config['cufflinks']['num_cores']),
+                                      memory="{}G".format(config['cufflinks']['max_mem']))
 
         # Create workflow from created jobs
-        # root_job.addChild(merge_job)
-        # merge_job.addChild(cufflinks_job)
-        # root_job.addChild(cufflinks_job)
+        root_job.addChild(merge_job)
+        merge_job.addChild(cufflinks_job)
+        root_job.addChild(cufflinks_job)
 
-    # cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, sample, samples,
-    #                               cores=int(config['cuffmerge']['num_cores']),
-    #                               memory="{}G".format(config['cuffmerge']['max_mem']))
-    #
-    # root_job.addFollowOn(cuffmerge_job)
+    cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, sample, samples,
+                                  cores=int(config['cuffmerge']['num_cores']),
+                                  memory="{}G".format(config['cuffmerge']['max_mem']))
+
+    root_job.addFollowOn(cuffmerge_job)
 
     for sample in samples:
         cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
@@ -65,7 +65,7 @@ if __name__ == "__main__":
                                       memory="{}G".format(config['cuffquant']['max_mem']))
 
         # cuffmerge_job.addChild(cuffquant_job)
-        root_job.addChild(cuffquant_job)
+        cuffmerge_job.addChild(cuffquant_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
