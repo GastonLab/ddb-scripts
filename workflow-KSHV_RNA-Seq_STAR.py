@@ -53,11 +53,11 @@ if __name__ == "__main__":
         input_bams.append(samples[sample]['star'])
         input_bams.append(samples[sample]['bowtie'])
 
-        merge_job = Job.wrapFn(gatk.merge_sam, config, sample, input_bams,
+        merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
                                cores=int(config['picard-merge']['num_cores']),
                                memory="{}G".format(config['picard-merge']['max_mem']))
 
-        cufflinks_job = Job.wrapFn(cufflinks.cufflinks, config, sample, merge_job.rv(),
+        cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, merge_job.rv(),
                                    cores=int(config['cufflinks']['num_cores']),
                                    memory="{}G".format(config['cufflinks']['max_mem']))
 
