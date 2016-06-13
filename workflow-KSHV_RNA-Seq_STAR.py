@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     root_job.addFollowOn(cuffmerge_job)
 
-    config['transcript_reference'] = "merged.gtf"
+    config['merged_transcript_reference'] = "merged.gtf"
 
     for sample in samples:
         cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
