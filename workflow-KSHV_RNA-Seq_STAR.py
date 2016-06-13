@@ -57,9 +57,11 @@ if __name__ == "__main__":
                                cores=int(config['picard-merge']['num_cores']),
                                memory="{}G".format(config['picard-merge']['max_mem']))
 
-        cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, merge_job.rv(),
-                                   cores=int(config['cufflinks']['num_cores']),
-                                   memory="{}G".format(config['cufflinks']['max_mem']))
+        samples[sample]['bam'] = "{}.merged.sorted.bam".format(sample)
+
+        cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
+                                      cores=int(config['cufflinks']['num_cores']),
+                                      memory="{}G".format(config['cufflinks']['max_mem']))
 
         # Create workflow from created jobs
         root_job.addChild(align_job)
