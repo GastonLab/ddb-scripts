@@ -43,7 +43,7 @@ if __name__ == "__main__":
                                   cores=int(config['star']['num_cores']),
                                   memory="{}G".format(config['star']['max_mem']))
 
-        # samples[sample]['star'] = "{}.star.Aligned.sortedByCoord.out.bam".format(sample)
+        samples[sample]['star'] = "{}.star.Aligned.sortedByCoord.out.bam".format(sample)
         samples[sample]['unmapped_fastq'] = "{}.star.Unmapped.out.mate1".format(sample)
 
         bowtie_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
