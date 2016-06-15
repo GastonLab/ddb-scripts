@@ -53,7 +53,8 @@ if __name__ == "__main__":
         root_job.addChild(align_job)
         align_job.addChild(initial_st_job)
 
-    merge_job = Job.wrapJobFn(stringtie.stringtie_merge, config, samples, flags, " ".join(transcripts_list),
+    transcripts_list_string = " ".join(transcripts_list)
+    merge_job = Job.wrapJobFn(stringtie.stringtie_merge, config, samples, flags, transcripts_list_string,
                               cores=int(config['stringtie']['num_cores']),
                               memory="{}G".format(config['stringtie']['max_mem']))
 
