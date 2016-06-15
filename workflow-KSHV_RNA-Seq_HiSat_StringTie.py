@@ -31,12 +31,12 @@ if __name__ == "__main__":
 
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
+    transcripts_list = list()
+    flags = ["keep_retained"]
 
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        flags = ["keep_retained"]
-
         align_job = Job.wrapJobFn(hisat.hisat_unpaired, config, sample, samples, flags,
                                   cores=int(config['hisat']['num_cores']),
                                   memory="{}G".format(config['hisat']['max_mem']))
@@ -47,13 +47,15 @@ if __name__ == "__main__":
                                        cores=int(config['stringtie']['num_cores']),
                                        memory="{}G".format(config['stringtie']['max_mem']))
 
+        transcripts_list.append("{}.stringtie_first.gtf".format(sample))
+
         # Create workflow from created jobs
         root_job.addChild(align_job)
         align_job.addChild(initial_st_job)
 
-    merge_job = Job.wrapJobFn(stringtie.stringtie_merge, config, samples, flags,
-                              cores=int(config['cuffmerge']['num_cores']),
-                              memory="{}G".format(config['cuffmerge']['max_mem']))
+    merge_job = Job.wrapJobFn(stringtie.stringtie_merge, config, samples, flags, " ".join(transcripts_list),
+                              cores=int(config['stringtie']['num_cores']),
+                              memory="{}G".format(config['stringtie']['max_mem']))
 
     root_job.addFollowOn(merge_job)
 
