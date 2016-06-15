@@ -39,26 +39,26 @@ if __name__ == "__main__":
         # Alignment and Refinement Stages
         flags = ("local", "unstranded", "removeNonCanonical", "2-stage", "cufflinks")
 
-        align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples, flags,
-                                  cores=int(config['star']['num_cores']),
-                                  memory="{}G".format(config['star']['max_mem']))
-
-        samples[sample]['star'] = "{}.star.Aligned.sortedByCoord.out.bam".format(sample)
-        samples[sample]['unmapped_fastq'] = "{}.star.Unmapped.out.mate1".format(sample)
-
-        bowtie_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
-                                   cores=int(config['bowtie']['num_cores']),
-                                   memory="{}G".format(config['bowtie']['max_mem']))
-
-        input_bams = list()
-        input_bams.append(samples[sample]['star'])
-        input_bams.append(samples[sample]['bowtie'])
-
-        merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
-                               cores=int(config['picard-merge']['num_cores']),
-                               memory="{}G".format(config['picard-merge']['max_mem']))
-
-        working_dir = os.getcwd()
+        # align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples, flags,
+        #                           cores=int(config['star']['num_cores']),
+        #                           memory="{}G".format(config['star']['max_mem']))
+        #
+        # samples[sample]['star'] = "{}.star.Aligned.sortedByCoord.out.bam".format(sample)
+        # samples[sample]['unmapped_fastq'] = "{}.star.Unmapped.out.mate1".format(sample)
+        #
+        # bowtie_job = Job.wrapJobFn(bowtie.bowtie_unpaired, config, sample, samples, flags,
+        #                            cores=int(config['bowtie']['num_cores']),
+        #                            memory="{}G".format(config['bowtie']['max_mem']))
+        #
+        # input_bams = list()
+        # input_bams.append(samples[sample]['star'])
+        # input_bams.append(samples[sample]['bowtie'])
+        #
+        # merge_job = Job.wrapJobFn(gatk.merge_sam, config, sample, input_bams,
+        #                        cores=int(config['picard-merge']['num_cores']),
+        #                        memory="{}G".format(config['picard-merge']['max_mem']))
+        #
+        # working_dir = os.getcwd()
         # samples[sample]['bam'] = os.path.join(working_dir, "{}.merged.sorted.bam".format(sample))
 
         cufflinks_job = Job.wrapJobFn(cufflinks.cufflinks, config, sample, samples,
@@ -66,11 +66,12 @@ if __name__ == "__main__":
                                       memory="{}G".format(config['cufflinks']['max_mem']))
 
         # Create workflow from created jobs
-        root_job.addChild(align_job)
-        align_job.addChild(bowtie_job)
-        bowtie_job.addChild(merge_job)
-        align_job.addChild(merge_job)
-        merge_job.addChild(cufflinks_job)
+        # root_job.addChild(align_job)
+        # align_job.addChild(bowtie_job)
+        # bowtie_job.addChild(merge_job)
+        # align_job.addChild(merge_job)
+        # merge_job.addChild(cufflinks_job)
+        root_job.addChild(cufflinks_job)
 
     cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, "blah", samples, "manifest.txt",
                                   cores=int(config['cuffmerge']['num_cores']),
