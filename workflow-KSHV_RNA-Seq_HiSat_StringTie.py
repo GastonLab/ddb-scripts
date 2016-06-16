@@ -37,21 +37,21 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        align_job = Job.wrapJobFn(hisat.hisat_unpaired, config, sample, samples, flags,
-                                  cores=int(config['hisat']['num_cores']),
-                                  memory="{}G".format(config['hisat']['max_mem']))
+        # align_job = Job.wrapJobFn(hisat.hisat_unpaired, config, sample, samples, flags,
+        #                           cores=int(config['hisat']['num_cores']),
+        #                           memory="{}G".format(config['hisat']['max_mem']))
 
         samples[sample]['bam'] = "{}.hisat.sorted.bam".format(sample)
 
-        initial_st_job = Job.wrapJobFn(stringtie.stringtie_first, config, sample, samples, flags,
-                                       cores=int(config['stringtie']['num_cores']),
-                                       memory="{}G".format(config['stringtie']['max_mem']))
+        # initial_st_job = Job.wrapJobFn(stringtie.stringtie_first, config, sample, samples, flags,
+        #                                cores=int(config['stringtie']['num_cores']),
+        #                                memory="{}G".format(config['stringtie']['max_mem']))
 
         transcripts_list.append("{}.stringtie_first.gtf".format(sample))
 
         # Create workflow from created jobs
-        root_job.addChild(align_job)
-        align_job.addChild(initial_st_job)
+        # root_job.addChild(align_job)
+        # align_job.addChild(initial_st_job)
 
     transcripts_list_string = " ".join(transcripts_list)
     merge_job = Job.wrapJobFn(stringtie.stringtie_merge, config, samples, flags, transcripts_list_string,
