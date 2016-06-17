@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        align_job = Job.wrapJobFn(hisat.hisat_unpaired, config, sample, samples, flags,
+        align_job = Job.wrapJobFn(hisat.hisat_paired, config, sample, samples, flags,
                                   cores=int(config['hisat']['num_cores']),
                                   memory="{}G".format(config['hisat']['max_mem']))
 
