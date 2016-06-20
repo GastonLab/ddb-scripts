@@ -15,6 +15,7 @@ from ddb_ngsflow import pipeline
 from ddb_ngsflow.align import bwa
 from ddb_ngsflow.utils import utilities
 from ddb_ngsflow.qc import qc
+from ddb_ngsflow.coverage import sambamba
 from ddb_ngsflow.variation import variation
 from ddb_ngsflow.variation import freebayes
 from ddb_ngsflow.variation import mutect
@@ -68,7 +69,7 @@ if __name__ == "__main__":
 
         # Variant Calling
         spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
-        coverage_job = Job.wrapJobFn(utilities.sambamba_region_coverage, config, sample, samples,
+        coverage_job = Job.wrapJobFn(sambamba.sambamba_region_coverage, config, sample, samples,
                                      "{}.recalibrated.sorted.bam".format(sample),
                                      cores=int(config['gatk']['num_cores']),
                                      memory="{}G".format(config['gatk']['max_mem']))
