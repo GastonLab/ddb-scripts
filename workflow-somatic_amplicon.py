@@ -14,6 +14,7 @@ from ddb_ngsflow import annotation
 from ddb_ngsflow import pipeline
 from ddb_ngsflow.align import bwa
 from ddb_ngsflow.utils import utilities
+from ddb_ngsflow.qc import qc
 from ddb_ngsflow.variation import variation
 from ddb_ngsflow.variation import freebayes
 from ddb_ngsflow.variation import mutect
@@ -40,7 +41,7 @@ if __name__ == "__main__":
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
 
-    fastqc_job = Job.wrapJobFn(utilities.run_fastqc, config, samples)
+    fastqc_job = Job.wrapJobFn(qc.run_fastqc, config, samples)
 
     # Per sample jobs
     for sample in samples:
