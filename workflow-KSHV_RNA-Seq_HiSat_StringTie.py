@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
     transcripts_list = list()
-    flags = ["keep_retained"]
+    flags = ["keep_retained", "max_intron", "stranded"]
 
     # Per sample jobs
     for sample in samples:
