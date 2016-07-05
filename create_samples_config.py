@@ -45,4 +45,6 @@ if __name__ == "__main__":
             else:
                 sys.stderr.write("Sample line {} has unknown pool {}\n".format(sample_line, info[-2]))
 
+            output.write("\n")
+
             lib_num += 1
