@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Alignment and Refinement Stages
-        flags = ("keep_retained")
+        flags = ("keep_retained", "limit_bam_sort_ram", "cufflinks")
 
         align_job = Job.wrapJobFn(star.star_unpaired, config, sample, samples, flags,
                                   cores=int(config['star']['num_cores']),
