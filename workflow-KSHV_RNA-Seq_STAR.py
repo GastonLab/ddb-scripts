@@ -50,6 +50,8 @@ if __name__ == "__main__":
                                    cores=int(config['bowtie']['num_cores']),
                                    memory="{}G".format(config['bowtie']['max_mem']))
 
+        samples[sample]['bowtie'] = "{}.bowtie.sam".format(sample)
+
         input_bams = list()
         input_bams.append(samples[sample]['star'])
         input_bams.append(samples[sample]['bowtie'])
