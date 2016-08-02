@@ -71,9 +71,7 @@ if __name__ == "__main__":
         root_job.addChild(align_job)
         align_job.addChild(bowtie_job)
         bowtie_job.addChild(merge_job)
-        align_job.addChild(merge_job)
         merge_job.addChild(cufflinks_job)
-        root_job.addChild(cufflinks_job)
 
     cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, "blah", samples, "manifest.txt",
                                   cores=int(config['cuffmerge']['num_cores']),
