@@ -68,16 +68,16 @@ if __name__ == "__main__":
                                       memory="{}G".format(config['cufflinks']['max_mem']))
 
         # Create workflow from created jobs
-        root_job.addChild(align_job)
-        align_job.addChild(bowtie_job)
-        bowtie_job.addChild(merge_job)
-        merge_job.addChild(cufflinks_job)
+        # root_job.addChild(align_job)
+        # align_job.addChild(bowtie_job)
+        # bowtie_job.addChild(merge_job)
+        # merge_job.addChild(cufflinks_job)
 
     cuffmerge_job = Job.wrapJobFn(cufflinks.cuffmerge, config, "blah", samples, "manifest.txt",
                                   cores=int(config['cuffmerge']['num_cores']),
                                   memory="{}G".format(config['cuffmerge']['max_mem']))
 
-    root_job.addFollowOn(cuffmerge_job)
+    # root_job.addFollowOn(cuffmerge_job)
 
     config['merged_transcript_reference'] = "./merged_asm/merged.gtf"
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         cuffquant_job = Job.wrapJobFn(cufflinks.cuffquant, config, sample, samples,
                                       cores=int(config['cuffquant']['num_cores']),
                                       memory="{}G".format(config['cuffquant']['max_mem']))
-        cuffmerge_job.addChild(cuffquant_job)
+        root_job.addChild(cuffquant_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
