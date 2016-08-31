@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
             sys.stdout.write("Processing library {}\n".format(library_name))
             output.write("[{lib}]\nfastq1: {lib}_L001_R1_001.fastq.gz\n"
-                         "fastq2: {lib}_L001_R1_001.fastq.gz\nlibrary_name: {lib}\n"
+                         "fastq2: {lib}_L001_R2_001.fastq.gz\nlibrary_name: {lib}\n"
                          "sample_name: {sample}\nextraction: default\npanel: {panel}\n"
                          "target_pool: {pool}\nsequencer: {seq}\nrun_id: {run}\nnum_libraries_in_run: {num}\n"
                          "".format(lib=library_name, sample=sample_name, panel=args.panel, pool=info[-2],
