@@ -9,8 +9,6 @@ from toil.job import Job
 
 # Package methods
 from ddb import configuration
-from ddb_ngsflow import gatk
-from ddb_ngsflow import annotation
 from ddb_ngsflow import pipeline
 from ddb_ngsflow.variation.sv import itdseek
 
