@@ -34,17 +34,6 @@ if __name__ == "__main__":
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
 
-    # Per sample jobs
-    for sample in samples:
-        # Variant Calling
-        haplotypecaller_job = Job.wrapJobFn(haplotypecaller.haplotypecaller_single, config, sample, samples,
-                                            "{}.recalibrated.sorted.bam".format(sample),
-                                            cores=1,
-                                            memory="{}G".format(config['gatk-haplotypecaller']['max_mem']))
-
-        # Create workflow from created jobs
-        root_job.addChild(haplotypecaller_job)
-
     # Need to filter for on target only results somewhere as well
     joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, config['project'], samples,
                                    cores=int(config['gatk-jointgenotyper']['num_cores']),
@@ -74,7 +63,7 @@ if __name__ == "__main__":
                                memory="{}G".format(config['snpeff']['max_mem']))
 
     # root_job.addFollowOn(joint_call_job)
-    root_job.addFollowOn(joint_call_job)
+    root_job.addChild(joint_call_job)
     joint_call_job.addChild(normalization_job)
     normalization_job.addChild(gatk_annotate_job)
     gatk_annotate_job.addChild(gatk_filter_job)
