@@ -24,6 +24,7 @@ if __name__ == "__main__":
     with open(args.output, 'w') as output:
         lib_num = 1
         for sample_line in sample_lines:
+
             info = sample_line.split(',')
             sample_name = info[0]
             library_name = "{}_S{}".format(sample_name, lib_num)
