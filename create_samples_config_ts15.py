@@ -37,14 +37,9 @@ if __name__ == "__main__":
                          "".format(lib=library_name, sample=sample_name, panel=args.panel, pool=info[-2],
                                    seq=args.sequencer, run=args.run_id, num=num_samples))
 
-            if info[-2] == 'PoolA':
-                output.write("regions: /mnt/shared-data/Resources/MiSeqPanels/tst15-regionsA.bed\n")
-                output.write("vcfanno_config: /mnt/shared-data/ddb-configs/annotation/vcfanno_ts15A.conf\n")
-            elif info[-2] == 'PoolB':
-                output.write("regions: /mnt/shared-data/Resources/MiSeqPanels/tst15-regionsB.bed\n")
-                output.write("vcfanno_config: /mnt/shared-data/ddb-configs/annotation/vcfanno_ts15B.conf\n")
-            else:
-                sys.stderr.write("Sample line {} has unknown pool {}\n".format(sample_line, info[-2]))
+
+            output.write("regions: /mnt/shared-data/Resources/MiSeqPanels/trusight-myeloid.bed\n")
+            output.write("vcfanno_config: /mnt/shared-data/ddb-configs/annotation/vcfanno-tsmyeloid.conf\n")
 
             output.write("\n")
 
