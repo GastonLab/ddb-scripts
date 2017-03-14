@@ -40,7 +40,7 @@ if __name__ == "__main__":
         sample_root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
         root_job.addChild(sample_root_job)
         input_bams = list()
-        for library in libraries:
+        for library in samples[sample]:
             # Alignment and Refinement Stages
             align_job = Job.wrapJobFn(bwa.run_bwa_mem, config, library, libraries,
                                       cores=int(config['bwa']['num_cores']),
@@ -54,70 +54,68 @@ if __name__ == "__main__":
             align_job.addChild(add_job)
 
         input_bams_string = " INPUT=".join(input_bams)
-        print input_bams_string
+        dedup_job = Job.wrapJobFn(gatk.mark_duplicates, config, sample, input_bams_string,
+                                  cores=int(config['picard-dedup']['num_cores']),
+                                  memory="{}G".format(config['picard-dedup']['max_mem']))
 
-        # dedup_job = Job.wrapJobFn(gatk.mark_duplicates, config, sample, input_bams_string,
-        #                           cores=int(config['picard-dedup']['num_cores']),
-        #                           memory="{}G".format(config['picard-dedup']['max_mem']))
-        #
-        # creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample, dedup_job.rv(),
-        #                             cores=int(config['gatk-realign']['num_cores']),
-        #                             memory="{}G".format(config['gatk-realign']['max_mem']))
-        #
-        # realign_job = Job.wrapJobFn(gatk.realign_indels, config, sample, dedup_job.rv(), creator_job.rv(),
-        #                             cores=1,
-        #                             memory="{}G".format(config['gatk-realign']['max_mem']))
-        #
-        # recal_job = Job.wrapJobFn(gatk.recalibrator, config, sample, realign_job.rv(),
-        #                           cores=int(config['gatk-recal']['num_cores']),
-        #                           memory="{}G".format(config['gatk-recal']['max_mem']))
-        # # Variant Calling
-        # haplotypecaller_job = Job.wrapJobFn(haplotypecaller.haplotypecaller_single, config, sample, samples,
-        #                                     recal_job.rv(),
-        #                                     cores=1,
-        #                                     memory="{}G".format(config['gatk-haplotypecaller']['max_mem']))
+        creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample, dedup_job.rv(),
+                                    cores=int(config['gatk-realign']['num_cores']),
+                                    memory="{}G".format(config['gatk-realign']['max_mem']))
+
+        realign_job = Job.wrapJobFn(gatk.realign_indels, config, sample, dedup_job.rv(), creator_job.rv(),
+                                    cores=1,
+                                    memory="{}G".format(config['gatk-realign']['max_mem']))
+
+        recal_job = Job.wrapJobFn(gatk.recalibrator, config, sample, realign_job.rv(),
+                                  cores=int(config['gatk-recal']['num_cores']),
+                                  memory="{}G".format(config['gatk-recal']['max_mem']))
+        # Variant Calling
+        haplotypecaller_job = Job.wrapJobFn(haplotypecaller.haplotypecaller_single, config, sample, samples,
+                                            recal_job.rv(),
+                                            cores=1,
+                                            memory="{}G".format(config['gatk-haplotypecaller']['max_mem']))
 
         # Create workflow from created jobs
-        # sample_root_job.addFollowOn(dedup_job)
-        # dedup_job.addChild(creator_job)
-        # creator_job.addChild(realign_job)
-        # realign_job.addChild(recal_job)
-        # recal_job.addChild(haplotypecaller_job)
+        sample_root_job.addFollowOn(dedup_job)
+        dedup_job.addChild(creator_job)
+        creator_job.addChild(realign_job)
+        realign_job.addChild(recal_job)
+        recal_job.addChild(haplotypecaller_job)
 
     # Need to filter for on target only results somewhere as well
-    # joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, config['project'], samples,
-    #                                cores=int(config['gatk-jointgenotyper']['num_cores']),
-    #                                memory="{}G".format(config['gatk-jointgenotyper']['max_mem']))
-    #
-    # normalization_job = Job.wrapJobFn(variation.vt_normalization, config, config['project'], "hc",
-    #                                   "{}.haplotypecaller.vcf".format(config['project']),
-    #                                   cores=1,
-    #                                   memory="{}G".format(config['gatk']['max_mem']))
-    #
-    # sample_inputs = list()
-    # for sample in samples:
-    #     sample = "{}.recalibrated.sorted.bam".format(sample)
-    #     sample_inputs.append(sample)
-    # sample_bam_string = " -I ".join(sample_inputs)
-    #
-    # gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, config['project'], normalization_job.rv(), sample_bam_string,
-    #                                   cores=int(config['gatk-annotate']['num_cores']),
-    #                                   memory="{}G".format(config['gatk-annotate']['max_mem']))
-    #
-    # gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, config['project'], gatk_annotate_job.rv(),
-    #                                 cores=1,
-    #                                 memory="{}G".format(config['gatk-filter']['max_mem']))
-    #
-    # snpeff_job = Job.wrapJobFn(annotation.snpeff, config, config['project'], gatk_filter_job.rv(),
-    #                            cores=int(config['snpeff']['num_cores']),
-    #                            memory="{}G".format(config['snpeff']['max_mem']))
+    joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, config['project'], samples,
+                                   cores=int(config['gatk-jointgenotyper']['num_cores']),
+                                   memory="{}G".format(config['gatk-jointgenotyper']['max_mem']))
+
+    normalization_job = Job.wrapJobFn(variation.vt_normalization, config, config['project'], "hc",
+                                      "{}.haplotypecaller.vcf".format(config['project']),
+                                      cores=1,
+                                      memory="{}G".format(config['gatk']['max_mem']))
+
+    sample_inputs = list()
+    for sample in samples:
+        sample = "{}.recalibrated.sorted.bam".format(sample)
+        sample_inputs.append(sample)
+    sample_bam_string = " -I ".join(sample_inputs)
+
+    gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, config['project'], normalization_job.rv(), sample_bam_string,
+                                      cores=int(config['gatk-annotate']['num_cores']),
+                                      memory="{}G".format(config['gatk-annotate']['max_mem']))
+
+    gatk_filter_job = Job.wrapJobFn(gatk.filter_variants, config, config['project'], gatk_annotate_job.rv(),
+                                    cores=1,
+                                    memory="{}G".format(config['gatk-filter']['max_mem']))
+
+    snpeff_job = Job.wrapJobFn(annotation.snpeff, config, config['project'], gatk_filter_job.rv(),
+                               cores=int(config['snpeff']['num_cores']),
+                               memory="{}G".format(config['snpeff']['max_mem']))
 
     # root_job.addFollowOn(joint_call_job)
-    # root_job.addFollowOn(joint_call_job)
-    # joint_call_job.addChild(normalization_job)
-    # normalization_job.addChild(gatk_annotate_job)
-    # gatk_annotate_job.addChild(gatk_filter_job)
-    # gatk_filter_job.addChild(snpeff_job)
+    root_job.addFollowOn(joint_call_job)
+    joint_call_job.addChild(normalization_job)
+    normalization_job.addChild(gatk_annotate_job)
+    gatk_annotate_job.addChild(gatk_filter_job)
+    gatk_filter_job.addChild(snpeff_job)
 
     # Start workflow execution
     Job.Runner.startToil(root_job, args)
