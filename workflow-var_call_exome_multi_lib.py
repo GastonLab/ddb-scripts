@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # Per sample jobs
     for sample in samples:
         # Variant Calling
-        haplotypecaller_job = Job.wrapJobFn(haplotypecaller.haplotypecaller_single, config, sample, samples,
+        haplotypecaller_job = Job.wrapJobFn(haplotypecaller.haplotypecaller_amplicon, config, sample, samples,
                                             "{}.recalibrated.sorted.bam".format(sample),
                                             cores=1,
                                             memory="{}G".format(config['gatk-haplotypecaller']['max_mem']))
