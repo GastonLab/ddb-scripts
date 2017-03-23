@@ -67,9 +67,7 @@ if __name__ == "__main__":
                                             memory="{}G".format(config['gatk-haplotypecaller']['max_mem']))
 
         # Create workflow from created jobs
-        root_job.addChild(align_job)
-        align_job.addChild(add_job)
-        add_job.addChild(dedup_job)
+        root_job.addChild(dedup_job)
         dedup_job.addChild(creator_job)
         creator_job.addChild(realign_job)
         realign_job.addChild(recal_job)
