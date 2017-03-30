@@ -63,37 +63,37 @@ if __name__ == "__main__":
         # Variant Calling
         spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
         coverage_job = Job.wrapJobFn(sambamba.sambamba_region_coverage, config, sample, samples,
-                                     "{}.recalibrated.sorted.bam".format(sample),
+                                     "../{}.recalibrated.sorted.bam".format(sample),
                                      cores=int(config['gatk']['num_cores']),
                                      memory="{}G".format(config['gatk']['max_mem']))
 
         freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample,
-                                      "{}.recalibrated.sorted.bam".format(sample),
+                                      "../{}.recalibrated.sorted.bam".format(sample),
                                       cores=1,
                                       memory="{}G".format(config['freebayes']['max_mem']))
 
         mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples,
-                                   "{}.recalibrated.sorted.bam".format(sample),
+                                   "../{}.recalibrated.sorted.bam".format(sample),
                                    cores=1,
                                    memory="{}G".format(config['mutect']['max_mem']))
 
         vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples,
-                                    "{}.recalibrated.sorted.bam".format(sample),
+                                    "../{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['vardict']['num_cores']),
                                     memory="{}G".format(config['vardict']['max_mem']))
 
         scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples,
-                                    "{}.recalibrated.sorted.bam".format(sample),
+                                    "../{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['scalpel']['num_cores']),
                                     memory="{}G".format(config['scalpel']['max_mem']))
 
         platypus_job = Job.wrapJobFn(platypus.platypus_single, config, sample, samples,
-                                     "{}.recalibrated.sorted.bam".format(sample),
+                                     "../{}.recalibrated.sorted.bam".format(sample),
                                      cores=int(config['platypus']['num_cores']),
                                      memory="{}G".format(config['platypus']['max_mem']))
 
         pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample,
-                                   "{}.recalibrated.sorted.bam".format(sample),
+                                   "../{}.recalibrated.sorted.bam".format(sample),
                                    cores=int(config['pindel']['num_cores']),
                                    memory="{}G".format(config['pindel']['max_mem']))
         #
