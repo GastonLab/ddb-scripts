@@ -140,7 +140,7 @@ if __name__ == "__main__":
                                                                                            normalization_job6.rv()))
 
         gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(),
-                                          "{}.recalibrated.sorted.bam".format(sample),
+                                          "../{}.recalibrated.sorted.bam".format(sample),
                                           cores=int(config['gatk-annotate']['num_cores']),
                                           memory="{}G".format(config['gatk-annotate']['max_mem']))
 
