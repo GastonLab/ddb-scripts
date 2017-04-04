@@ -3,7 +3,11 @@
 # Standard packages
 import os
 import sys
+import getpass
 import argparse
+
+from cassandra.cqlengine import connection
+from cassandra.auth import PlainTextAuthProvider
 
 # Third-party packages
 from toil.job import Job
@@ -14,7 +18,6 @@ from ddb_ngsflow import gatk
 from ddb_ngsflow import annotation
 from ddb_ngsflow import pipeline
 from ddb_ngsflow.align import bwa
-from ddb_ngsflow.utils import utilities
 from ddb_ngsflow.qc import qc
 from ddb_ngsflow.coverage import sambamba
 from ddb_ngsflow.variation import variation
@@ -30,6 +33,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--samples_file', help="Input configuration file for samples")
     parser.add_argument('-c', '--configuration', help="Configuration file for various settings")
+    parser.add_argument('-a', '--address', help="IP Address for Cassandra connection", default='127.0.0.1')
+    parser.add_argument('-u', '--username', help='Cassandra username for login', default=None)
     Job.Runner.addToilOptions(parser)
     args = parser.parse_args()
     args.logLevel = "INFO"
@@ -54,6 +59,12 @@ if __name__ == "__main__":
 
     sys.stdout.write("Parsing sample data\n")
     samples = configuration.configure_samples(args.samples_file, config)
+
+    if args.username:
+        password = getpass.getpass()
+        auth_provider = PlainTextAuthProvider(username=args.username, password=password)
+    else:
+        auth_provider = None
 
     # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
