@@ -14,7 +14,6 @@ from ddb_ngsflow import gatk
 from ddb_ngsflow import annotation
 from ddb_ngsflow import pipeline
 from ddb_ngsflow.align import bwa
-from ddb_ngsflow.utils import utilities
 from ddb_ngsflow.qc import qc
 from ddb_ngsflow.coverage import sambamba
 from ddb_ngsflow.variation import variation

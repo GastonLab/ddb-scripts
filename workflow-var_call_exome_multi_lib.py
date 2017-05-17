@@ -47,7 +47,7 @@ if __name__ == "__main__":
         root_job.addChild(haplotypecaller_job)
 
     # Need to filter for on target only results somewhere as well
-    joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling, config, config['project'], samples,
+    joint_call_job = Job.wrapJobFn(haplotypecaller.joint_variant_calling_amplicon, config, config['project'], samples,
                                    cores=int(config['gatk-jointgenotyper']['num_cores']),
                                    memory="{}G".format(config['gatk-jointgenotyper']['max_mem']))
 
