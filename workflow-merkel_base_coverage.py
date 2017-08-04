@@ -9,20 +9,8 @@ from toil.job import Job
 
 # Package methods
 from ddb import configuration
-from ddb_ngsflow import gatk
-from ddb_ngsflow import annotation
 from ddb_ngsflow import pipeline
-from ddb_ngsflow.align import bwa
-from ddb_ngsflow.utils import utilities
-from ddb_ngsflow.qc import qc
 from ddb_ngsflow.coverage import sambamba
-from ddb_ngsflow.variation import variation
-from ddb_ngsflow.variation import freebayes
-from ddb_ngsflow.variation import mutect
-from ddb_ngsflow.variation import platypus
-from ddb_ngsflow.variation import vardict
-from ddb_ngsflow.variation import scalpel
-from ddb_ngsflow.variation.sv import pindel
 
 
 if __name__ == "__main__":
