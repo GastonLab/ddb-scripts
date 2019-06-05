@@ -27,8 +27,10 @@ from ddb_ngsflow.variation.sv import pindel
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', '--samples_file', help="Input configuration file for samples")
-    parser.add_argument('-c', '--configuration', help="Configuration file for various settings")
+    parser.add_argument('-s', '--samples_file',
+                        help="Input configuration file for samples")
+    parser.add_argument('-c', '--configuration',
+                        help="Configuration file for various settings")
     Job.Runner.addToilOptions(parser)
     args = parser.parse_args()
     args.logLevel = "INFO"
@@ -54,7 +56,8 @@ if __name__ == "__main__":
     sys.stdout.write("Parsing sample data\n")
     samples = configuration.configure_samples(args.samples_file, config)
 
-    # Workflow Graph definition. The following workflow definition should create a valid Directed Acyclic Graph (DAG)
+    # Workflow Graph definition. The following workflow definition should
+    # create a valid Directed Acyclic Graph (DAG)
     root_job = Job.wrapJobFn(pipeline.spawn_batch_jobs, cores=1)
 
     fastqc_job = Job.wrapJobFn(qc.run_fastqc, config, samples)
@@ -66,45 +69,54 @@ if __name__ == "__main__":
                                   cores=int(config['bwa']['num_cores']),
                                   memory="{}G".format(config['bwa']['max_mem']))
 
-        add_job = Job.wrapJobFn(gatk.add_or_replace_readgroups, config, sample, align_job.rv(),
+        add_job = Job.wrapJobFn(gatk.add_or_replace_readgroups, config, sample,
+                                align_job.rv(),
                                 cores=1,
                                 memory="{}G".format(config['picard-add']['max_mem']))
 
-        creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample, add_job.rv(),
+        creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample,
+                                    add_job.rv(),
                                     cores=int(config['gatk-realign']['num_cores']),
                                     memory="{}G".format(config['gatk-realign']['max_mem']))
 
-        realign_job = Job.wrapJobFn(gatk.realign_indels, config, sample, add_job.rv(), creator_job.rv(),
+        realign_job = Job.wrapJobFn(gatk.realign_indels, config, sample,
+                                    add_job.rv(), creator_job.rv(),
                                     cores=1,
                                     memory="{}G".format(config['gatk-realign']['max_mem']))
 
-        recal_job = Job.wrapJobFn(gatk.recalibrator, config, sample, realign_job.rv(),
+        recal_job = Job.wrapJobFn(gatk.recalibrator, config, sample,
+                                  realign_job.rv(),
                                   cores=int(config['gatk-recal']['num_cores']),
                                   memory="{}G".format(config['gatk-recal']['max_mem']))
 
         # Variant Calling
         spawn_variant_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
-        coverage_job = Job.wrapJobFn(sambamba.sambamba_region_coverage, config, sample, samples,
+        coverage_job = Job.wrapJobFn(sambamba.sambamba_region_coverage, config,
+                                     sample, samples,
                                      "{}.recalibrated.sorted.bam".format(sample),
                                      cores=int(config['gatk']['num_cores']),
                                      memory="{}G".format(config['gatk']['max_mem']))
 
-        freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config, sample,
+        freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config,
+                                      sample,
                                       "{}.recalibrated.sorted.bam".format(sample),
                                       cores=1,
                                       memory="{}G".format(config['freebayes']['max_mem']))
 
-        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample, samples,
+        mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample,
+                                   samples,
                                    "{}.recalibrated.sorted.bam".format(sample),
                                    cores=1,
                                    memory="{}G".format(config['mutect']['max_mem']))
 
-        vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample, samples,
+        vardict_job = Job.wrapJobFn(vardict.vardict_single, config, sample,
+                                    samples,
                                     "{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['vardict']['num_cores']),
                                     memory="{}G".format(config['vardict']['max_mem']))
 
-        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample, samples,
+        scalpel_job = Job.wrapJobFn(scalpel.scalpel_single, config, sample,
+                                    samples,
                                     "{}.recalibrated.sorted.bam".format(sample),
                                     cores=int(config['scalpel']['num_cores']),
                                     memory="{}G".format(config['scalpel']['max_mem']))
