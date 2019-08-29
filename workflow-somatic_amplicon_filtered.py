@@ -17,10 +17,12 @@ from ddb_ngsflow.align import bwa
 from ddb_ngsflow.qc import qc
 from ddb_ngsflow.coverage import sambamba
 from ddb_ngsflow.variation import variation
+from ddb_ngsflow.variation import freebayes
 from ddb_ngsflow.variation import mutect
 from ddb_ngsflow.variation import platypus
 from ddb_ngsflow.variation import vardict
 from ddb_ngsflow.variation import scalpel
+from ddb_ngsflow.variation.sv import pindel
 
 
 if __name__ == "__main__":
@@ -95,6 +97,12 @@ if __name__ == "__main__":
                                      cores=int(config['gatk']['num_cores']),
                                      memory="{}G".format(config['gatk']['max_mem']))
 
+        freebayes_job = Job.wrapJobFn(freebayes.freebayes_single, config,
+                                      sample,
+                                      "{}.recalibrated.sorted.bam".format(sample),
+                                      cores=1,
+                                      memory="{}G".format(config['freebayes']['max_mem']))
+
         mutect_job = Job.wrapJobFn(mutect.mutect_single, config, sample,
                                    samples,
                                    "{}.recalibrated.sorted.bam".format(sample),
@@ -118,8 +126,18 @@ if __name__ == "__main__":
                                      cores=int(config['platypus']['num_cores']),
                                      memory="{}G".format(config['platypus']['max_mem']))
 
+        pindel_job = Job.wrapJobFn(pindel.run_pindel, config, sample,
+                                   "{}.recalibrated.sorted.bam".format(sample),
+                                   cores=int(config['pindel']['num_cores']),
+                                   memory="{}G".format(config['pindel']['max_mem']))
+        #
         # Need to filter for on target only results somewhere as well
         spawn_normalization_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
+
+        normalization_job1 = Job.wrapJobFn(variation.vt_normalization, config, sample, "freebayes",
+                                           "{}.freebayes.vcf".format(sample),
+                                           cores=1,
+                                           memory="{}G".format(config['gatk']['max_mem']))
 
         normalization_job2 = Job.wrapJobFn(variation.vt_normalization, config, sample, "mutect",
                                            "{}.mutect.vcf".format(sample),
@@ -141,12 +159,19 @@ if __name__ == "__main__":
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
-        callers = "mutect,vardict,scalpel,platypus"
+        normalization_job6 = Job.wrapJobFn(variation.vt_normalization, config, sample, "pindel",
+                                           "{}.pindel.vcf".format(sample),
+                                           cores=1,
+                                           memory="{}G".format(config['gatk']['max_mem']))
 
-        merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job2.rv(),
+        callers = "freebayes,mutect,vardict,scalpel,platypus,pindel"
+
+        merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
+                                                                                           normalization_job2.rv(),
                                                                                            normalization_job3.rv(),
                                                                                            normalization_job4.rv(),
-                                                                                           normalization_job5.rv()))
+                                                                                           normalization_job5.rv(),
+                                                                                           normalization_job6.rv()))
 
         gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(),
                                           "{}.recalibrated.sorted.bam".format(sample),
@@ -176,17 +201,21 @@ if __name__ == "__main__":
         recal_job.addChild(spawn_variant_job)
 
         spawn_variant_job.addChild(coverage_job)
+        spawn_variant_job.addChild(freebayes_job)
         spawn_variant_job.addChild(mutect_job)
         spawn_variant_job.addChild(vardict_job)
         spawn_variant_job.addChild(scalpel_job)
         spawn_variant_job.addChild(platypus_job)
+        spawn_variant_job.addChild(pindel_job)
 
         spawn_variant_job.addFollowOn(spawn_normalization_job)
 
+        spawn_normalization_job.addChild(normalization_job1)
         spawn_normalization_job.addChild(normalization_job2)
         spawn_normalization_job.addChild(normalization_job3)
         spawn_normalization_job.addChild(normalization_job4)
         spawn_normalization_job.addChild(normalization_job5)
+        spawn_normalization_job.addChild(normalization_job6)
 
         spawn_normalization_job.addFollowOn(merge_job)
 
