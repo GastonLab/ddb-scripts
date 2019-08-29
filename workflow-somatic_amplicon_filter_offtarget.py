@@ -70,11 +70,11 @@ if __name__ == "__main__":
                                   memory="{}G".format(config['bwa']['max_mem']))
 
         filter_job = Job.wrapJobFn(bwa.run_bedtools_filter, config, sample, samples,
-                                align_job.rv(), cores=1,
-                                memory="{}G".format(config['bwa']['max_mem']))
+                                   align_job.rv(), cores=1,
+                                   memory="{}G".format(config['bwa']['max_mem']))
 
         add_job = Job.wrapJobFn(gatk.add_or_replace_readgroups, config, sample,
-                                filter.rv(), cores=1,
+                                filter_job.rv(), cores=1,
                                 memory="{}G".format(config['picard-add']['max_mem']))
 
         creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample,
