@@ -169,6 +169,8 @@ if __name__ == "__main__":
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
+        spawn_filter_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
+
         qual_filter_job1 = Job.wrapJobFn(variation.filter_low_quality_variants,
                                          config, sample, "freebayes",
                                          "{}.freebayes.normalized.vcf".format(sample),
@@ -258,6 +260,15 @@ if __name__ == "__main__":
         spawn_normalization_job.addChild(normalization_job4)
         spawn_normalization_job.addChild(normalization_job5)
         spawn_normalization_job.addChild(normalization_job6)
+
+        spawn_normalization_job.addFollowOn(spawn_filter_job)
+
+        spawn_filter_job.addChild(qual_filter_job1)
+        spawn_filter_job.addChild(qual_filter_job2)
+        spawn_filter_job.addChild(qual_filter_job3)
+        spawn_filter_job.addChild(qual_filter_job4)
+        spawn_filter_job.addChild(qual_filter_job5)
+        spawn_filter_job.addChild(qual_filter_job6)
 
         spawn_normalization_job.addFollowOn(merge_job)
 
