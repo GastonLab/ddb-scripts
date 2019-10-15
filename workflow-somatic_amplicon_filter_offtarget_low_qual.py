@@ -178,14 +178,14 @@ if __name__ == "__main__":
                                          memory="{}G".format(config['gatk']['max_mem']))
 
         qual_filter_job2 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "freebayes",
-                                         "{}.freebayes.normalized.vcf".format(sample),
+                                         config, sample, "mutect",
+                                         "{}.mutect.normalized.vcf".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
         qual_filter_job3 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "mutect",
-                                         "{}.mutect.normalized.vcf".format(sample),
+                                         config, sample, "vardict",
+                                         "{}.vardict.normalized.vcf".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
