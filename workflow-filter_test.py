@@ -35,21 +35,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.logLevel = "INFO"
 
-    sys.stdout.write("Setting up analysis directory\n")
-
-    if not os.path.exists("Logs"):
-        os.makedirs("Logs")
-    if not os.path.exists("FinalVCFs"):
-        os.makedirs("FinalVCFs")
-    if not os.path.exists("FinalBAMs"):
-        os.makedirs("FinalBAMs")
-    if not os.path.exists("Intermediates"):
-        os.makedirs("Intermediates")
-    if not os.path.exists("Coverage"):
-        os.makedirs("Coverage")
-    if not os.path.exists("Reports"):
-        os.makedirs("Reports")
-
     sys.stdout.write("Parsing configuration data\n")
     config = configuration.configure_runtime(args.configuration)
 
