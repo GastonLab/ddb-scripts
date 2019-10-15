@@ -270,7 +270,7 @@ if __name__ == "__main__":
         spawn_filter_job.addChild(qual_filter_job5)
         spawn_filter_job.addChild(qual_filter_job6)
 
-        spawn_normalization_job.addFollowOn(merge_job)
+        spawn_filter_job.addFollowOn(merge_job)
 
         merge_job.addChild(gatk_annotate_job)
         gatk_annotate_job.addChild(gatk_filter_job)
