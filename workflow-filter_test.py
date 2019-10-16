@@ -135,7 +135,7 @@ if __name__ == "__main__":
                                         cores=1,
                                         memory="{}G".format(config['gatk']['max_mem']))
 
-        qual_filter_job5 = Job.wrapJobFn(variation.filter_low_qsupportvariants,
+        qual_filter_job5 = Job.wrapJobFn(variation.filter_low_support_variants,
                                          config, sample, "platypus",
                                          "{}.platypus.rehead.vcf.gz".format(sample),
                                          cores=1,
