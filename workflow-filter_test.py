@@ -51,39 +51,111 @@ if __name__ == "__main__":
     for sample in samples:
         spawn_filter_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
 
-        qual_filter_job1 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "freebayes",
+        bgzip_tabix_job1 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "freebayes",
                                          "{}.freebayes.normalized.vcf".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
-        qual_filter_job2 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "mutect",
+        add_contig_job1 = Job.wrapJobFn(variation.add_refcontig_info_header,
+                                        config, sample, "freebayes",
+                                        "{}.freebayes.normalized.vcf.gz".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job1 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "freebayes",
+                                         "{}.freebayes.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job2 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "mutect",
                                          "{}.mutect.normalized.vcf".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
-        qual_filter_job3 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "vardict",
+        add_contig_job2 = Job.wrapJobFn(variation.add_refcontig_info_header,
+                                        config, sample, "mutect",
+                                        "{}.mutect.normalized.vcf.gz".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job2 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "mutect",
+                                         "{}.mutect.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job3 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "vardict",
                                          "{}.vardict.normalized.vcf".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
-        qual_filter_job4 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "scalpel",
+        add_contig_job3 = Job.wrapJobFn(variation.add_refcontig_info_header,
+                                        config, sample, "vardict",
+                                        "{}.vardict.normalized.vcf.gz".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job3 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "vardict",
+                                         "{}.vardict.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job4 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "scalpel",
                                          "{}.scalpel.normalized.vcf".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
-        qual_filter_job5 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "platypus",
+        add_contig_job4 = Job.wrapJobFn(variation.add_refcontig_info_header,
+                                        config, sample, "scalpel",
+                                        "{}.scalpel.normalized.vcf.gz".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job4 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "scalpel",
+                                         "{}.scalpel.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job5 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "platypus",
                                          "{}.platypus.normalized.vcf".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
-        qual_filter_job6 = Job.wrapJobFn(variation.filter_low_quality_variants,
-                                         config, sample, "pindel",
+        add_contig_job5 = Job.wrapJobFn(variation.add_refcontig_info_header,
+                                        config, sample, "platypus",
+                                        "{}.platypus.normalized.vcf.gz".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job5 = Job.wrapJobFn(variation.filter_low_qsupportvariants,
+                                         config, sample, "platypus",
+                                         "{}.platypus.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job6 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "pindel",
                                          "{}.pindel.normalized.vcf".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        add_contig_job6 = Job.wrapJobFn(variation.add_refcontig_info_header,
+                                        config, sample, "pindel",
+                                        "{}.pindel.normalized.vcf.gz".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job6 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "pindel",
+                                         "{}.pindel.rehead.vcf.gz".format(sample),
                                          cores=1,
                                          memory="{}G".format(config['gatk']['max_mem']))
 
@@ -117,12 +189,29 @@ if __name__ == "__main__":
         # Create workflow from created jobs
         root_job.addChild(spawn_filter_job)
 
-        spawn_filter_job.addChild(qual_filter_job1)
-        spawn_filter_job.addChild(qual_filter_job2)
-        spawn_filter_job.addChild(qual_filter_job3)
-        spawn_filter_job.addChild(qual_filter_job4)
-        spawn_filter_job.addChild(qual_filter_job5)
-        spawn_filter_job.addChild(qual_filter_job6)
+        spawn_filter_job.addChild(bgzip_tabix_job1)
+        bgzip_tabix_job1.addChild(add_contig_job1)
+        add_contig_job1.addChild(qual_filter_job1)
+
+        spawn_filter_job.addChild(bgzip_tabix_job2)
+        bgzip_tabix_job2.addChild(add_contig_job2)
+        add_contig_job2.addChild(qual_filter_job2)
+
+        spawn_filter_job.addChild(bgzip_tabix_job3)
+        bgzip_tabix_job3.addChild(add_contig_job3)
+        add_contig_job3.addChild(qual_filter_job3)
+
+        spawn_filter_job.addChild(bgzip_tabix_job4)
+        bgzip_tabix_job4.addChild(add_contig_job4)
+        add_contig_job4.addChild(qual_filter_job4)
+
+        spawn_filter_job.addChild(bgzip_tabix_job5)
+        bgzip_tabix_job5.addChild(add_contig_job5)
+        add_contig_job5.addChild(qual_filter_job5)
+
+        spawn_filter_job.addChild(bgzip_tabix_job6)
+        bgzip_tabix_job6.addChild(add_contig_job6)
+        add_contig_job6.addChild(qual_filter_job6)
 
         spawn_filter_job.addFollowOn(merge_job)
 
