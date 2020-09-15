@@ -69,12 +69,17 @@ if __name__ == "__main__":
                                   cores=int(config['bwa']['num_cores']),
                                   memory="{}G".format(config['bwa']['max_mem']))
 
+        filter_job = Job.wrapJobFn(bwa.run_bedtools_filter, config, sample,
+                                   samples,
+                                   align_job.rv(), cores=1,
+                                   memory="{}G".format(config['bwa']['max_mem']))
+
         add_job = Job.wrapJobFn(gatk.add_or_replace_readgroups, config, sample,
-                                align_job.rv(),
-                                cores=1,
+                                filter_job.rv(), cores=1,
                                 memory="{}G".format(config['picard-add']['max_mem']))
 
-        creator_job = Job.wrapJobFn(gatk.realign_target_creator, config, sample,
+        creator_job = Job.wrapJobFn(gatk.realign_target_creator, config,
+                                    sample,
                                     add_job.rv(),
                                     cores=int(config['gatk-realign']['num_cores']),
                                     memory="{}G".format(config['gatk-realign']['max_mem']))
@@ -164,14 +169,124 @@ if __name__ == "__main__":
                                            cores=1,
                                            memory="{}G".format(config['gatk']['max_mem']))
 
+        spawn_filter_job = Job.wrapJobFn(pipeline.spawn_variant_jobs)
+
+        bgzip_tabix_job1 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "freebayes",
+                                         "{}.freebayes.rehead.vcf".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        add_contig_job1 = Job.wrapJobFn(variation.PicardUpdateVCFDict,
+                                        config, sample, "freebayes",
+                                        "{}.freebayes.normalized.vcf".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job1 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "freebayes",
+                                         "{}.freebayes.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job2 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "mutect",
+                                         "{}.mutect.rehead.vcf".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        add_contig_job2 = Job.wrapJobFn(variation.PicardUpdateVCFDict,
+                                        config, sample, "mutect",
+                                        "{}.mutect.normalized.vcf".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job2 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "mutect",
+                                         "{}.mutect.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job3 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "vardict",
+                                         "{}.vardict.rehead.vcf".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        add_contig_job3 = Job.wrapJobFn(variation.PicardUpdateVCFDict,
+                                        config, sample, "vardict",
+                                        "{}.vardict.normalized.vcf".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job3 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "vardict",
+                                         "{}.vardict.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job4 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "scalpel",
+                                         "{}.scalpel.rehead.vcf".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        add_contig_job4 = Job.wrapJobFn(variation.PicardUpdateVCFDict,
+                                        config, sample, "scalpel",
+                                        "{}.scalpel.normalized.vcf".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job4 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "scalpel",
+                                         "{}.scalpel.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job5 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "platypus",
+                                         "{}.platypus.rehead.vcf".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        add_contig_job5 = Job.wrapJobFn(variation.PicardUpdateVCFDict,
+                                        config, sample, "platypus",
+                                        "{}.platypus.normalized.vcf".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job5 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "platypus",
+                                         "{}.platypus.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        bgzip_tabix_job6 = Job.wrapJobFn(variation.bgzip_tabix_vcf, config,
+                                         sample, "pindel",
+                                         "{}.pindel.rehead.vcf".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
+        add_contig_job6 = Job.wrapJobFn(variation.PicardUpdateVCFDict,
+                                        config, sample, "pindel",
+                                        "{}.pindel.normalized.vcf".format(sample),
+                                        cores=1,
+                                        memory="{}G".format(config['gatk']['max_mem']))
+
+        qual_filter_job6 = Job.wrapJobFn(variation.filter_low_support_variants,
+                                         config, sample, "pindel",
+                                         "{}.pindel.rehead.vcf.gz".format(sample),
+                                         cores=1,
+                                         memory="{}G".format(config['gatk']['max_mem']))
+
         callers = "freebayes,mutect,vardict,scalpel,platypus,pindel"
 
-        merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (normalization_job1.rv(),
-                                                                                           normalization_job2.rv(),
-                                                                                           normalization_job3.rv(),
-                                                                                           normalization_job4.rv(),
-                                                                                           normalization_job5.rv(),
-                                                                                           normalization_job6.rv()))
+        merge_job = Job.wrapJobFn(variation.merge_variant_calls, config, sample, callers, (qual_filter_job1.rv(),
+                                                                                           qual_filter_job2.rv(),
+                                                                                           qual_filter_job3.rv(),
+                                                                                           qual_filter_job4.rv(),
+                                                                                           qual_filter_job5.rv(),
+                                                                                           qual_filter_job6.rv()))
 
         gatk_annotate_job = Job.wrapJobFn(gatk.annotate_vcf, config, sample, merge_job.rv(),
                                           "{}.recalibrated.sorted.bam".format(sample),
@@ -193,7 +308,8 @@ if __name__ == "__main__":
 
         # Create workflow from created jobs
         root_job.addChild(align_job)
-        align_job.addChild(add_job)
+        align_job.addChild(filter_job)
+        filter_job.addChild(add_job)
         add_job.addChild(creator_job)
         creator_job.addChild(realign_job)
         realign_job.addChild(recal_job)
@@ -217,7 +333,33 @@ if __name__ == "__main__":
         spawn_normalization_job.addChild(normalization_job5)
         spawn_normalization_job.addChild(normalization_job6)
 
-        spawn_normalization_job.addFollowOn(merge_job)
+        spawn_normalization_job.addFollowOn(spawn_filter_job)
+
+        spawn_filter_job.addChild(add_contig_job1)
+        add_contig_job1.addChild(bgzip_tabix_job1)
+        bgzip_tabix_job1.addChild(qual_filter_job1)
+
+        spawn_filter_job.addChild(add_contig_job2)
+        add_contig_job2.addChild(bgzip_tabix_job2)
+        bgzip_tabix_job2.addChild(qual_filter_job2)
+
+        spawn_filter_job.addChild(add_contig_job3)
+        add_contig_job3.addChild(bgzip_tabix_job3)
+        bgzip_tabix_job3.addChild(qual_filter_job3)
+
+        spawn_filter_job.addChild(add_contig_job4)
+        add_contig_job4.addChild(bgzip_tabix_job4)
+        bgzip_tabix_job4.addChild(qual_filter_job4)
+
+        spawn_filter_job.addChild(add_contig_job5)
+        add_contig_job5.addChild(bgzip_tabix_job5)
+        bgzip_tabix_job5.addChild(qual_filter_job5)
+
+        spawn_filter_job.addChild(add_contig_job6)
+        add_contig_job6.addChild(bgzip_tabix_job6)
+        bgzip_tabix_job6.addChild(qual_filter_job6)
+
+        spawn_filter_job.addFollowOn(merge_job)
 
         merge_job.addChild(gatk_annotate_job)
         gatk_annotate_job.addChild(gatk_filter_job)
